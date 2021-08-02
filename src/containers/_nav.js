@@ -46,6 +46,12 @@ const _nav =  [
     icon: <CIcon name="cil-puzzle" customClasses="c-sidebar-nav-icon"/>,
   },
   {
+    _tag: 'CSidebarNavItem',
+    name: 'Stages',
+    to: '/master/stages',
+    icon: <CIcon name="cil-puzzle" customClasses="c-sidebar-nav-icon"/>,
+  },
+  {
     _tag: 'CSidebarNavTitle',
     _children: ['Config']
   },

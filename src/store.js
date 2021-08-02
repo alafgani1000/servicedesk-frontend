@@ -1,17 +1,9 @@
-import { createStore } from 'redux'
+import { configureStore } from "@reduxjs/toolkit";
+import urlSlice from "./features/urlSlice";
 
-const initialState = {
-  sidebarShow: 'responsive'
-}
 
-const changeState = (state = initialState, { type, ...rest }) => {
-  switch (type) {
-    case 'set':
-      return {...state, ...rest }
-    default:
-      return state
+export default configureStore({
+  reducer: {
+    url:urlSlice
   }
-}
-
-const store = createStore(changeState)
-export default store
+})

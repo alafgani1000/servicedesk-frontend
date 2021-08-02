@@ -36,13 +36,13 @@ const getBadge = actions => {
   }
 }
 
-const fields = ['name','createdAt','updatedAt','actions']
+const fields = ['role','createdAt','updatedAt','actions']
 
-const Teams = () => {
+const Roles = () => {
 
   let history = useHistory();
   const [status, setStatus] = useState('')
-  const [teams, setTeams] = useState([])
+  const [roles, setRoles] = useState([])
   const [team, setTeam] = useState('')
   const [modal, setModal] = useState(false)
   const [modalAdd, setModalAdd] = useState(false)
@@ -58,30 +58,30 @@ const Teams = () => {
   const url = useSelector((state) => state.url.value)
   const dispatch = useDispatch()
   
-  let getTeam = () => {
-    axios.get(`${url}/api/team/`,{
+  let getRole = () => {
+    axios.get(`${url}/api/role/`,{
       headers:{
         token:localStorage.getItem('shitToken')
       }
     })
     .then(function(response){
       setStatus(response.data.message)
-      setTeams(response.data.data)
+      setRoles(response.data.data)
     })
     .catch(function(error){
       history.push('/login')
     })
   }
 
-  let editTeam = (id) => {
-    axios.get(`${url}/api/team/${id}`,{
+  let editRole = (id) => {
+    axios.get(`${url}/api/role/${id}`,{
       headers:{
         token:localStorage.getItem('shitToken')
       }
     })
     .then(function(res){
       setEid(res.data.data.id)
-      setEname(res.data.data.name)
+      setEname(res.data.data.role)
     })
     .catch(function(error){
       history.push('/login');
@@ -90,9 +90,9 @@ const Teams = () => {
     setModal(!modal)
   }
 
-  let updateTeam = (id) => {
-    axios.put(`${url}/api/team/${id}/update`,{
-      'name':ename,
+  let updateRole = (id) => {
+    axios.put(`${url}/api/role/${id}/update`,{
+      'role':ename,
     },{
       headers:{
         token:localStorage.getItem('shitToken')
@@ -100,7 +100,7 @@ const Teams = () => {
     })
     .then(function(res){
       setSuccessVisible(10)
-      getTeam()
+      getRole()
       setModal(false)
     })
     .catch(function(error){
@@ -109,9 +109,9 @@ const Teams = () => {
     });
   }
 
-  let storeTeam = (id) => {
-    axios.post(`${url}/api/team/store`,{
-      name:iname
+  let storeRole = (id) => {
+    axios.post(`${url}/api/role/store`,{
+      'role':iname
     },{
       headers:{
         token:localStorage.getItem('shitToken')
@@ -119,7 +119,7 @@ const Teams = () => {
     })
     .then(function(res){
       setSuccessStore(10)
-      getTeam()
+      getRole()
       setModalAdd(false)
     })
     .catch(function(error){
@@ -128,15 +128,15 @@ const Teams = () => {
     })
   }
 
-  let deleteTeam = (id) => {
-    axios.delete(`${url}/api/team/${id}/delete`,{
+  let deleteRole = (id) => {
+    axios.delete(`${url}/api/role/${id}/delete`,{
       headers:{
         token:localStorage.getItem('shitToken')
       }
     })
     .then(function(){
       setSuccessDelete(10)
-      getTeam()
+      getRole()
     })
     .catch(function(){
       setErrorStore(10)
@@ -144,7 +144,7 @@ const Teams = () => {
   }
 
   useEffect(() => {
-    getTeam()
+    getRole()
   }, [])
 
  
@@ -156,7 +156,7 @@ const Teams = () => {
           onClose={setModal}
         >
           <CModalHeader closeButton>
-            <CModalTitle>Edit Team</CModalTitle>
+            <CModalTitle>Edit Role</CModalTitle>
           </CModalHeader>
           <CModalBody>
             <CRow>
@@ -169,7 +169,7 @@ const Teams = () => {
             </CRow>
           </CModalBody>
           <CModalFooter>
-            <CButton onClick={() => {updateTeam(eid)}} color="primary">Update</CButton>
+            <CButton onClick={() => {updateRole(eid)}} color="primary">Update</CButton>
             <CButton 
               color="secondary" 
               onClick={() => {setModal(false)}}
@@ -182,20 +182,20 @@ const Teams = () => {
           onClose={setModalAdd}
         >
           <CModalHeader closeButton>
-            <CModalTitle>Add Team</CModalTitle>
+            <CModalTitle>Add Role</CModalTitle>
           </CModalHeader>
           <CModalBody>
             <CRow>
               <CCol xs="12">
                 <CFormGroup>
                   <CLabel htmlFor="name">Name</CLabel>
-                  <CInput onChange={event => setIname(event.target.value)} id="name" placeholder="Enter your name" required />
+                  <CInput onChange={event => setIname(event.target.value)} id="role" placeholder="Enter your name" required />
                 </CFormGroup>
               </CCol>
             </CRow>
           </CModalBody>
           <CModalFooter>
-            <CButton onClick={() => {storeTeam()}} color="primary">Save</CButton>
+            <CButton onClick={() => {storeRole()}} color="primary">Save</CButton>
             <CButton 
               color="secondary" 
               onClick={() => {setModalAdd(false)}}
@@ -206,13 +206,13 @@ const Teams = () => {
           <CCard>
             <CCardHeader>
               <CButton onClick={() => {setModalAdd(!modal)}} size="sm" color="primary">
-                Add Team
+                Add Role
               </CButton>
             </CCardHeader>
           </CCard>
           <CCard>
             <CCardHeader>
-              Teams
+              Roles
               <DocsLink name="CModal"/>
             </CCardHeader>
             <CCardBody>
@@ -222,7 +222,7 @@ const Teams = () => {
               closeButton
               onShowChange={setSuccessVisible}
             >
-              Team updated
+              Role updated
               <CProgress
                 striped
                 color="success"
@@ -307,7 +307,7 @@ const Teams = () => {
               />
             </CAlert>
             <CDataTable
-              items={teams}
+              items={roles}
               fields={fields}
               itemsPerPage={5}
               pagination
@@ -323,10 +323,10 @@ const Teams = () => {
                 'actions':
                   (item)=>(
                     <td>
-                      <CButton size="sm"  onClick={() => {editTeam(item.id)}} color={getBadge('Pending')} className="mr-1">
+                      <CButton size="sm"  onClick={() => {editRole(item.id)}} color={getBadge('Pending')} className="mr-1">
                         Edit
                       </CButton>
-                      <CButton size="sm"  onClick={() => {deleteTeam(item.id)}} color={getBadge('Banned')} className="mr-1">
+                      <CButton size="sm"  onClick={() => {deleteRole(item.id)}} color={getBadge('Banned')} className="mr-1">
                         Delete
                       </CButton>
                     </td>
@@ -341,4 +341,4 @@ const Teams = () => {
   )
 }
 
-export default Teams
+export default Roles

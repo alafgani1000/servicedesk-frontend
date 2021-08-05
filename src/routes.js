@@ -40,6 +40,8 @@ const Users = React.lazy(() => import('./views/users/Users'));
 const User = React.lazy(() => import('./views/users/User'));
 const Teams = React.lazy(() => import('./views/master/teams/Teams'));
 const Roles = React.lazy(() => import('./views/master/roles/Roles'));
+const Stages = React.lazy(() => import('./views/master/stages/Stages'));
+const Categories = React.lazy(() => import('./views/master/categories/Categories'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -87,6 +89,8 @@ const routes = [
   { path: '/transaction/incidents', name: 'Incidents', component: Incidents},
   { path: '/master/teams', name: 'Teams', component: Teams},
   { path: '/master/roles', name: 'Roles', component: Roles},
+  { path: '/master/stages', name: 'Stages', component: Stages},
+  { path: '/master/categories', name: 'Categories', component: Categories }
 ];
 
 export default routes;

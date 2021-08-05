@@ -35,19 +35,22 @@ const getBadge = actions => {
   }
 }
 
-const fields = ['name','createdAt','updatedAt','actions']
+const fields = ['text','description','createdAt','updatedAt','actions']
 
-const Teams = () => {
+const Stages = () => {
 
   let history = useHistory();
   const [status, setStatus] = useState('')
-  const [teams, setTeams] = useState([])
-  const [team, setTeam] = useState('')
+  const [stages, setStages] = useState([])
   const [modal, setModal] = useState(false)
   const [modalAdd, setModalAdd] = useState(false)
-  const [ename, setEname] = useState('')
-  const [iname, setIname] = useState('')
+  const [modalDelete, setModalDelete] = useState(false)
+  const [etext, setEtext] = useState('')
+  const [edesc, setEdesc] = useState('')
+  const [itext, setItext] = useState('')
+  const [idesc, setIdesc] = useState('')
   const [eid, setEid] = useState('')
+  const [delid, setDelid] = useState('')
   const [successVisible, setSuccessVisible] = useState(0)
   const [errorVisible, setErrorVisible] = useState(0)
   const [errorStore, setErrorStore] = useState(0)
@@ -56,50 +59,47 @@ const Teams = () => {
   const [successDelete, setSuccessDelete] = useState(0)
   const url = useSelector((state) => state.url.value)
   const dispatch = useDispatch()
+
+  const Axs = axios.create({
+      headers: {
+          token: localStorage.getItem('shitToken')
+      },
+      baseURL: url
+  })
   
-  let getTeam = () => {
-    axios.get(`${url}/api/team/`,{
-      headers:{
-        token:localStorage.getItem('shitToken')
-      }
+  const getStage = () => {
+    Axs.get(`api/stage/`,{
+
     })
     .then(function(response){
       setStatus(response.data.message)
-      setTeams(response.data.data)
+      setStages(response.data.data)
     })
     .catch(function(error){
       history.push('/login')
     })
   }
 
-  let editTeam = (id) => {
-    axios.get(`${url}/api/team/${id}`,{
-      headers:{
-        token:localStorage.getItem('shitToken')
-      }
-    })
-    .then(function(res){
-      setEid(res.data.data.id)
-      setEname(res.data.data.name)
-    })
-    .catch(function(error){
-      history.push('/login');
-    })
-
+  const editStage = (item) => {
+    setEid(item.id)
+    setEtext(item.text)
+    setEdesc(item.description)
     setModal(!modal)
   }
 
-  let updateTeam = (id) => {
-    axios.put(`${url}/api/team/${id}/update`,{
-      'name':ename,
-    },{
-      headers:{
-        token:localStorage.getItem('shitToken')
-      }
+  const deleteConfirm =  (item) => {
+      setDelid(item.id)
+      setModalDelete(!modalDelete)
+  }
+
+  const updateStage = (id) => {
+    Axs.put(`api/stage/${id}/update`,{
+      'text': etext,
+      'description': edesc
     })
     .then(function(res){
       setSuccessVisible(10)
-      getTeam()
+      getStage()
       setModal(false)
     })
     .catch(function(error){
@@ -108,17 +108,14 @@ const Teams = () => {
     });
   }
 
-  let storeTeam = (id) => {
-    axios.post(`${url}/api/team/store`,{
-      name:iname
-    },{
-      headers:{
-        token:localStorage.getItem('shitToken')
-      }
+  const storeStage = (id) => {
+    Axs.post(`api/stage/store`,{
+        'text':itext,
+        'description': idesc
     })
     .then(function(res){
       setSuccessStore(10)
-      getTeam()
+      getStage()
       setModalAdd(false)
     })
     .catch(function(error){
@@ -127,23 +124,23 @@ const Teams = () => {
     })
   }
 
-  let deleteTeam = (id) => {
-    axios.delete(`${url}/api/team/${id}/delete`,{
-      headers:{
-        token:localStorage.getItem('shitToken')
-      }
+  let deleteStage = (id) => {
+    Axs.delete(`api/stage/${id}/delete`,{
+     
     })
     .then(function(){
       setSuccessDelete(10)
-      getTeam()
+      getStage()
+      setModalDelete(false)
     })
     .catch(function(){
       setErrorStore(10)
+      setModalDelete(false)
     })
   }
 
   useEffect(() => {
-    getTeam()
+    getStage()
   }, [])
 
  
@@ -155,25 +152,51 @@ const Teams = () => {
           onClose={setModal}
         >
           <CModalHeader closeButton>
-            <CModalTitle>Edit Team</CModalTitle>
+            <CModalTitle>Edit Stage</CModalTitle>
           </CModalHeader>
           <CModalBody>
             <CRow>
               <CCol xs="12">
                 <CFormGroup>
-                  <CLabel htmlFor="name">Name</CLabel>
-                  <CInput value={ename} onChange={event => setEname(event.target.value)} id="name" placeholder="Enter your name" required />
+                  <CLabel htmlFor="text">Text</CLabel>
+                  <CInput value={etext} onChange={event => setEtext(event.target.value)} id="etext" placeholder="Enter name stage" required />
+                </CFormGroup>
+                <CFormGroup>
+                    <CLabel htmlFor="desc">Description</CLabel>
+                    <CInput value={edesc} onChange={event => setEdesc(event.target.value)} id="edesc" placeholder="Description" required />
                 </CFormGroup>
               </CCol>
             </CRow>
           </CModalBody>
           <CModalFooter>
-            <CButton onClick={() => {updateTeam(eid)}} color="primary">Update</CButton>
+            <CButton onClick={() => {updateStage(eid)}} color="primary">Update</CButton>
             <CButton 
               color="secondary" 
               onClick={() => {setModal(false)}}
             >Cancel</CButton>
           </CModalFooter>
+        </CModal>
+        <CModal 
+            show={modalDelete}
+            onClose={setModalDelete}
+        >
+            <CModalHeader closeButton>
+                <CModalTitle>Confirm</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                <CRow>
+                    <CCol xs="12">
+                        <CLabel>Delete data ?</CLabel>
+                    </CCol>
+                </CRow>
+            </CModalBody>
+            <CModalFooter>
+                <CButton onClick={() => {deleteStage(delid)}} color="primary">Delete</CButton>
+                <CButton 
+                color="secondary" 
+                onClick={() => {setModalDelete(false)}}
+                >Cancel</CButton>
+            </CModalFooter>
         </CModal>
         {/* add modal */}
         <CModal 
@@ -181,20 +204,24 @@ const Teams = () => {
           onClose={setModalAdd}
         >
           <CModalHeader closeButton>
-            <CModalTitle>Add Team</CModalTitle>
+            <CModalTitle>Add Stage</CModalTitle>
           </CModalHeader>
           <CModalBody>
             <CRow>
               <CCol xs="12">
                 <CFormGroup>
-                  <CLabel htmlFor="name">Name</CLabel>
-                  <CInput onChange={event => setIname(event.target.value)} id="name" placeholder="Enter your name" required />
+                  <CLabel htmlFor="text">Text</CLabel>
+                  <CInput onChange={event => setItext(event.target.value)} id="text" placeholder="Enter name stage" required />
+                </CFormGroup>
+                <CFormGroup>
+                    <CLabel htmlFor="text">Description</CLabel>
+                    <CInput onChange={event => setIdesc(event.target.value)} id="desc" placeholder="Description" required />
                 </CFormGroup>
               </CCol>
             </CRow>
           </CModalBody>
           <CModalFooter>
-            <CButton onClick={() => {storeTeam()}} color="primary">Save</CButton>
+            <CButton onClick={() => {storeStage()}} color="primary">Save</CButton>
             <CButton 
               color="secondary" 
               onClick={() => {setModalAdd(false)}}
@@ -205,13 +232,13 @@ const Teams = () => {
           <CCard>
             <CCardHeader>
               <CButton onClick={() => {setModalAdd(!modal)}} size="sm" color="primary">
-                Add Team
+                Add Stage
               </CButton>
             </CCardHeader>
           </CCard>
           <CCard>
             <CCardHeader>
-              Teams
+              Roles
               <DocsLink name="CModal"/>
             </CCardHeader>
             <CCardBody>
@@ -221,7 +248,7 @@ const Teams = () => {
               closeButton
               onShowChange={setSuccessVisible}
             >
-              Team updated
+              Role updated
               <CProgress
                 striped
                 color="success"
@@ -299,14 +326,14 @@ const Teams = () => {
               Data Deleted
               <CProgress
                 striped
-                color="danger"
+                color="success"
                 value={Number(successDelete) * 10}
                 size="xs"
                 className="mb-3"
               />
             </CAlert>
             <CDataTable
-              items={teams}
+              items={stages}
               fields={fields}
               itemsPerPage={5}
               pagination
@@ -322,10 +349,10 @@ const Teams = () => {
                 'actions':
                   (item)=>(
                     <td>
-                      <CButton size="sm"  onClick={() => {editTeam(item.id)}} color={getBadge('Pending')} className="mr-1">
+                      <CButton size="sm"  onClick={() => {editStage(item)}} color={getBadge('Pending')} className="mr-1">
                         Edit
                       </CButton>
-                      <CButton size="sm"  onClick={() => {deleteTeam(item.id)}} color={getBadge('Banned')} className="mr-1">
+                      <CButton size="sm"  onClick={() => {deleteConfirm(item)}} color={getBadge('Banned')} className="mr-1">
                         Delete
                       </CButton>
                     </td>
@@ -340,4 +367,4 @@ const Teams = () => {
   )
 }
 
-export default Teams
+export default Stages

@@ -36,13 +36,13 @@ const Modals = React.lazy(() => import('./views/notifications/modals/Modals'));
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'));
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'));
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'));
-const Users = React.lazy(() => import('./views/users/Users'));
+// const Users = React.lazy(() => import('./views/users/Users'));
 const User = React.lazy(() => import('./views/users/User'));
 const Teams = React.lazy(() => import('./views/master/teams/Teams'));
 const Roles = React.lazy(() => import('./views/master/roles/Roles'));
 const Stages = React.lazy(() => import('./views/master/stages/Stages'));
 const Categories = React.lazy(() => import('./views/master/categories/Categories'))
-
+const Users = React.lazy(() => import('./views/master/users/Users'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
@@ -82,7 +82,7 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', component: Modals },
   { path: '/notifications/toaster', name: 'Toaster', component: Toaster },
   { path: '/widgets', name: 'Widgets', component: Widgets },
-  { path: '/users', exact: true,  name: 'Users', component: Users },
+  // { path: '/users', exact: true,  name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   // new
   
@@ -90,7 +90,8 @@ const routes = [
   { path: '/master/teams', name: 'Teams', component: Teams},
   { path: '/master/roles', name: 'Roles', component: Roles},
   { path: '/master/stages', name: 'Stages', component: Stages},
-  { path: '/master/categories', name: 'Categories', component: Categories }
+  { path: '/master/categories', name: 'Categories', component: Categories },
+  { path: '/master/users', name: 'Users', component: Users }
 ];
 
 export default routes;

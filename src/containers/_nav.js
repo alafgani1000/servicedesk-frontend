@@ -64,7 +64,7 @@ const _nav =  [
   {
     _tag: 'CSidebarNavItem',
     name: 'Users',
-    to: '/master/roles',
+    to: '/master/users',
     icon: 'cil-user'
   },
 ]

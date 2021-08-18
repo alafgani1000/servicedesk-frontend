@@ -1,5 +1,4 @@
-import React, { useEffect, useState, createRef } from 'react'
-import classNames from 'classnames'
+import React, { useEffect, useState, useReducer } from 'react'
 import {
   CRow,
   CCol,
@@ -19,9 +18,10 @@ import {
   CInput,
   CForm,
   CTextarea,
+  CSelect,
+  CInputFile,
 } from '@coreui/react'
 import { DocsLink } from 'src/reusable'
-import usersData from '../../users/UsersData'
 import axios from 'axios'
 import { Redirect } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -38,14 +38,26 @@ const getBadge = stage => {
   }
 }
 
+const formReducer = (state, event) => {
+  return {
+    ...state,
+    [event.name]: event.value
+  }
+ }
+
 const fields = ['text','location', 'phone','category','stage','startDate','endDate','createdAt','updatedAt', 'actions']
 
 const Incidents = () => {
+  const [formData, setFormData] =  useReducer(formReducer, {})
+  const [submitting, setSubmitting] = useState(false)
+  const [fileData, setFileData] = useState(null)
+
   const [status, setStatus] = useState(null)
   const [incidents, setIncidents] = useState([])
   const url = useSelector(state => state.baseUrl)
   const [modal, setModal] = useState(false)
   const [modalAdd, setModalAdd] = useState(false)
+  const [stages, setStages] = useState([])
   const dispatch = useDispatch();
 
   const Axs = axios.create({
@@ -69,13 +81,43 @@ const Incidents = () => {
       })
   }
 
+  const getStages = () => {
+    Axs.get('api/stage',{
+
+    })
+    .then(function (response) {
+      setStages(response.data.data)
+    })
+    .catch(function (error) {
+      alert(error)
+    })
+  }
+
   const handleSubmit = event => {
     event.preventDefault();
-    alert("You submit form data");
+    setSubmitting(true);
+    console.log(fileData);
+
+    setTimeout(() => {
+      setSubmitting(false);
+    }, 3000)
+  }
+
+  const handleChange = event => {
+    const isCheckbox = event.target.type === 'checkbox';
+    setFormData({
+      name: event.target.name,
+      value: isCheckbox ? event.target.checked : event.target.value,
+    })
+  }
+
+  const handleFile = event => {
+      setFileData(event.target.files[0])
   }
 
   useEffect(() => {
     getIncidents()
+    getStages()
   },[])
 
  
@@ -97,19 +139,43 @@ const Incidents = () => {
                 <CCol xs="12">
                   <CFormGroup>
                     <CLabel htmlFor="text">Incident/Problem</CLabel>
-                    <CTextarea name="incident" id="incident" rows="5"></CTextarea>
+                    <CTextarea name="incident" id="incident" rows="5" onChange={handleChange}></CTextarea>
                   </CFormGroup>
                 </CCol>
+              </CRow>
+              <CRow>
                 <CCol sx="6">
                   <CFormGroup>
                       <CLabel htmlFor="location">Location</CLabel>
-                      <CInput id="location" placeholder="Lokasi" required />
+                      <CInput id="location" name="location" placeholder="Lokasi" onChange={handleChange} required />
                   </CFormGroup>
                 </CCol>
                 <CCol sx="6">
                   <CFormGroup>
-                      <CLabel htmlFor="phone">Interval</CLabel>
-                      <CInput id="phone" placeholder="Nomor Telephone" required />
+                      <CLabel htmlFor="phone">Phone</CLabel>
+                      <CInput name="phone" id="phone" placeholder="Nomor Telephone" onChange={handleChange} required />
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sx="6">
+                  <CFormGroup>
+                    <CLabel htmlFor="stage">Stage</CLabel>
+                    <CSelect name="stage" id="stage" onChange={handleChange}>
+                      {
+                        stages.map((value, index) => {
+                          return <option value={ value.text } key={index}>{ value.text }</option>
+                        })
+                      }
+                    </CSelect>
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sx="6">
+                  <CFormGroup>
+                    <CLabel htmlFor="lampiran">File</CLabel>
+                    <CInputFile name="lampiran" onChange={handleFile} />
                   </CFormGroup>
                 </CCol>
               </CRow>

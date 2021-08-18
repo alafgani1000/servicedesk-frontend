@@ -57,7 +57,7 @@ const Stages = () => {
   const [successStore, setSuccessStore] = useState(0)
   const [errorDelete,setErrorDelete] = useState(0)
   const [successDelete, setSuccessDelete] = useState(0)
-  const url = useSelector((state) => state.url.value)
+  const url = useSelector(state => state.baseUrl)
   const dispatch = useDispatch()
 
   const Axs = axios.create({

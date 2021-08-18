@@ -23,7 +23,6 @@ import { DocsLink } from 'src/reusable'
 import axios from 'axios'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUrl } from 'src/features/urlSlice'
 import moment from 'moment'
 
 const getBadge = actions => {
@@ -55,7 +54,7 @@ const Roles = () => {
   const [successStore, setSuccessStore] = useState(0)
   const [errorDelete,setErrorDelete] = useState(0)
   const [successDelete, setSuccessDelete] = useState(0)
-  const url = useSelector((state) => state.url.value)
+  const url = useSelector(state => state.baseUrl)
   const dispatch = useDispatch()
   
   let getRole = () => {

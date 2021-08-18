@@ -1,21 +1,6 @@
-import { configureStore } from "@reduxjs/toolkit"
-import { createStore } from 'redux'
-import urlSlice from "./features/urlSlice"
+import sideBarSlice from "./features/sideBarSlice"
+import { createStore,  } from 'redux'
 
-const initialState = {
-  sidebarShow: 'responsice'
-}
+const store = createStore(sideBarSlice)
+export default store
 
-const changeState = (state = initialState, { type, ...rest }) => {
-  switch(type) {
-    case 'set':
-      return {...state, ...rest}
-    default:
-      return state
-  }
-}
-export default configureStore({
-  reducer: {
-    url:urlSlice
-  }
-})

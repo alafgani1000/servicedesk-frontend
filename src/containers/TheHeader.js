@@ -23,6 +23,8 @@ import {
   TheHeaderDropdownTasks
 }  from './index'
 
+import { set } from '../features/sideBarSlice'
+
 const TheHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector(state => state.sidebarShow)

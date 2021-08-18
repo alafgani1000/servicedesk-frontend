@@ -17,6 +17,8 @@ import {
   CFormGroup,
   CLabel,
   CInput,
+  CForm,
+  CTextarea,
 } from '@coreui/react'
 import { DocsLink } from 'src/reusable'
 import usersData from '../../users/UsersData'
@@ -39,10 +41,9 @@ const getBadge = stage => {
 const fields = ['text','location', 'phone','category','stage','startDate','endDate','createdAt','updatedAt', 'actions']
 
 const Incidents = () => {
-  const [isLogin, setIsLogin] = useState(false)
   const [status, setStatus] = useState(null)
   const [incidents, setIncidents] = useState([])
-  const url = useSelector((state) => state.url.value)
+  const url = useSelector(state => state.baseUrl)
   const [modal, setModal] = useState(false)
   const [modalAdd, setModalAdd] = useState(false)
   const dispatch = useDispatch();
@@ -68,6 +69,11 @@ const Incidents = () => {
       })
   }
 
+  const handleSubmit = event => {
+    event.preventDefault();
+    alert("You submit form data");
+  }
+
   useEffect(() => {
     getIncidents()
   },[])
@@ -80,36 +86,42 @@ const Incidents = () => {
         <CModal 
           show={modalAdd} 
           onClose={setModalAdd}
-          size="xl"
+          size="lg"
         >
-          <CModalHeader closeButton>
-            <CModalTitle>New Incident</CModalTitle>
-          </CModalHeader>
-          <CModalBody>
-            <CRow>
-              <CCol xs="12">
-                <CFormGroup>
-                  <CLabel htmlFor="text">Incident/Problem</CLabel>
-                  <CInput id="text" placeholder="Ketikan masalah yang anda alami" required />
-                </CFormGroup>
-                <CFormGroup>
-                    <CLabel htmlFor="location">Location</CLabel>
-                    <CInput id="location" placeholder="Lokasi" required />
-                </CFormGroup>
-                <CFormGroup>
-                    <CLabel htmlFor="phone">Interval</CLabel>
-                    <CInput id="phone" placeholder="Nomor Telephone" required />
-                </CFormGroup>
-              </CCol>
-            </CRow>
-          </CModalBody>
-          <CModalFooter>
-            <CButton color="primary">Save</CButton>
-            <CButton 
-              color="secondary" 
-              onClick={() => {setModalAdd(false)}}
-            >Cancel</CButton>
-          </CModalFooter>
+          <CForm onSubmit={handleSubmit} method="post">
+            <CModalHeader closeButton>
+              <CModalTitle>New Incident</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CRow>
+                <CCol xs="12">
+                  <CFormGroup>
+                    <CLabel htmlFor="text">Incident/Problem</CLabel>
+                    <CTextarea name="incident" id="incident" rows="5"></CTextarea>
+                  </CFormGroup>
+                </CCol>
+                <CCol sx="6">
+                  <CFormGroup>
+                      <CLabel htmlFor="location">Location</CLabel>
+                      <CInput id="location" placeholder="Lokasi" required />
+                  </CFormGroup>
+                </CCol>
+                <CCol sx="6">
+                  <CFormGroup>
+                      <CLabel htmlFor="phone">Interval</CLabel>
+                      <CInput id="phone" placeholder="Nomor Telephone" required />
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+            </CModalBody>
+            <CModalFooter>
+              <CButton type="submit" color="primary">Save</CButton>
+              <CButton 
+                color="secondary" 
+                onClick={() => {setModalAdd(false)}}
+              >Cancel</CButton>
+            </CModalFooter>
+          </CForm>
         </CModal>
         {/* data table */}
         <CCol xs="12" lg="12">

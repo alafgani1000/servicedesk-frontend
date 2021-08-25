@@ -29,6 +29,8 @@ import {
   CCardTitle,
   CCardText,
   CLink,
+  CAlert,
+  CProgress
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { DocsLink } from 'src/reusable'
@@ -72,6 +74,9 @@ const Incidents = () => {
   const [modalDetail, setModalDetail] = useState(false)
   const [modalDelete, setModalDelete] = useState(false)
   const [stages, setStages] = useState([])
+  const [stageOpen, setStageOpen] = useState();
+  const [successCreate, setSuccessCreate] = useState(0)
+  const [successDelete, setSuccessDelete] = useState(0)
   const dispatch = useDispatch();
   const [toast, addToast] = useState(0)
   const toaster = useRef()
@@ -139,6 +144,8 @@ const Incidents = () => {
       .then(function(response){
         console.log(response)
         setModalDelete(false)
+        setSuccessDelete(8)
+        getIncidents()
       })
       .catch(function(error){
         console.log(error)
@@ -207,22 +214,30 @@ const Incidents = () => {
                 <CRow>
                   <CCol>
                     <CFormGroup>
-                      <CLabel htmlFor="location">Location</CLabel>
+                      <CLabel htmlFor="location">Location:</CLabel>
                       <CCardText>{incident.location}</CCardText>
                     </CFormGroup>
                   </CCol>
                   <CCol>
                     <CFormGroup>
-                      <CLabel htmlFor="phone">Phone</CLabel>
+                      <CLabel htmlFor="phone">Phone:</CLabel>
                       <CCardText>{incident.phone}</CCardText>
                     </CFormGroup>
                   </CCol>
                   <CCol>
                     <CFormGroup>
-                      <CLabel htmlFor="phone">Phone</CLabel>
+                      <CLabel htmlFor="stage">Stage:</CLabel>
                       <CCardText>{incident.stageIncidents.text}</CCardText>
                     </CFormGroup>
                   </CCol>
+              </CRow>
+              <CRow>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="created">Created By:</CLabel>
+                    <CCardText>{incident.userIncidents.name} {moment(incident.createdAt).format('DD-MM-YYYY H:m:s')}</CCardText>
+                  </CFormGroup>
+                </CCol>
               </CRow>
             </CForm>
           </CCardBody>
@@ -241,10 +256,22 @@ const Incidents = () => {
     Axs.get('api/stage',{
 
     })
-    .then(function (response) {
+    .then(function(response){
       setStages(response.data.data)
     })
-    .catch(function (error) {
+    .catch(function(error){
+      alert(error)
+    })
+  }
+
+  const getStageOpen = () => {
+    Axs.get(`api/stage/1`,{
+
+    })
+    .then(function(response){
+      setStageOpen(response.data.data)
+    })
+    .catch(function(error){
       alert(error)
     })
   }
@@ -256,7 +283,7 @@ const Incidents = () => {
     dataArray.append("text", formData.incident)
     dataArray.append("location", formData.location)
     dataArray.append("phone", formData.phone)
-    dataArray.append("stage_id", formData.stage)
+    dataArray.append("stage_id", stageOpen.id)
     // loop attachment
     for(var i = 0; i < fileData.length; i++){
       dataArray.append("file",fileData[i]) 
@@ -264,7 +291,9 @@ const Incidents = () => {
     // send data
     Axs.post('/api/incident/create', dataArray)
     .then(function(response){
-      setModalAdd(false);
+      setModalAdd(false)
+      setSuccessCreate(8)
+      getIncidents()
     })
     .catch(function(error){
       console.log(error)
@@ -289,11 +318,46 @@ const Incidents = () => {
   useEffect(() => {
     getIncidents()
     getStages()
+    getStageOpen()
   },[])
  
   return (
     <>
       <CRow>
+        {/* alert success create */}
+        <CCol xs="12" lg="12">
+          <CAlert
+            color="success"
+            show={successCreate}
+            closeButton
+            onShowChange={setSuccessCreate}
+          >
+            Incident created
+            <CProgress
+              striped
+              color="success"
+              value={Number(successCreate) * 10}
+              size="xs"
+              className="mb-3"
+            />
+          </CAlert>
+        {/* alert success delete */}
+          <CAlert
+            color="danger"
+            show={successDelete}
+            closeButton
+            onShowChange={setSuccessDelete}
+          >
+            Incident deleted
+            <CProgress
+              striped
+              color="danger"
+              value={Number(successDelete) * 10}
+              size="xs"
+              className="mb-3"
+            />
+          </CAlert>
+        </CCol>
         {/* modal */}
         <CModal 
           show={modalAdd} 
@@ -327,11 +391,11 @@ const Incidents = () => {
                   </CFormGroup>
                 </CCol>
               </CRow>
-              <CRow>
+              {/* <CRow>
                 <CCol sx="6">
                   <CFormGroup>
                     <CLabel htmlFor="stage">Stage</CLabel>
-                    <CSelect name="stage" id="stage" onSelect={handleChange}>
+                    <CSelect name="stage" id="stage" onChange={handleChange}>
                       {
                         stages.map((value, index) => {
                           return <option value={ value.id } key={index}>{ value.text }</option>
@@ -340,7 +404,7 @@ const Incidents = () => {
                     </CSelect>
                   </CFormGroup>
                 </CCol>
-              </CRow>
+              </CRow> */}
               <CRow>
                 <CCol sx="6">
                   <CFormGroup>

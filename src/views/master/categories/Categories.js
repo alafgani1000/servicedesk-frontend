@@ -1,5 +1,4 @@
-import React, { useEffect, useState, createRef } from 'react'
-import classNames from 'classnames'
+import React, { useEffect, useState } from 'react'
 import {
   CRow,
   CCol,
@@ -22,7 +21,7 @@ import {
 import { DocsLink } from 'src/reusable'
 import axios from 'axios'
 import { useHistory } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import moment from 'moment'
 
 const getBadge = actions => {
@@ -40,7 +39,6 @@ const fields = ['name','time_interval','createdAt','updatedAt','actions']
 const Categories = () => {
 
   let history = useHistory();
-  const [status, setStatus] = useState('')
   const [categories, setCategories] = useState([])
   const [modal, setModal] = useState(false)
   const [modalAdd, setModalAdd] = useState(false)
@@ -58,7 +56,6 @@ const Categories = () => {
   const [errorDelete,setErrorDelete] = useState(0)
   const [successDelete, setSuccessDelete] = useState(0)
   const url = useSelector(state => state.baseUrl)
-  const dispatch = useDispatch()
 
   const Axs = axios.create({
       headers: {
@@ -72,7 +69,6 @@ const Categories = () => {
 
     })
     .then(function(response){
-      setStatus(response.data.message)
       setCategories(response.data.data)
     })
     .catch(function(error){

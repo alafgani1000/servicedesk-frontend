@@ -1,6 +1,5 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { IoPeopleCircleSharp } from 'react-icons/io5'
 
 const _nav =  [
   {

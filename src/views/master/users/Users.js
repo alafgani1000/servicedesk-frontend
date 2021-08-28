@@ -20,12 +20,14 @@ import {
   CProgress,
   CSelect,
   CForm,
+  CButtonGroup,
 } from '@coreui/react'
 import { DocsLink } from 'src/reusable'
 import axios from 'axios'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
+import CIcon from '@coreui/icons-react'
 
 const getBadge = actions => {
   switch (actions) {
@@ -57,7 +59,7 @@ const Users = () => {
     const [successStore, setSuccessStore] = useState(0)
     const [errorDelete,setErrorDelete] = useState(0)
     const [successDelete, setSuccessDelete] = useState(0)
-    const url = useSelector((state) => state.url.value)
+    const url = useSelector(state => state.baseUrl)
     const dispatch = useDispatch()
     
     const Axs = axios.create({
@@ -386,12 +388,14 @@ const Users = () => {
                     'actions':
                     (item)=>(
                         <td>
-                        <CButton size="sm"  onClick={() => {editTeam(item.id)}} color={getBadge('Pending')} className="mr-1">
-                            Edit
-                        </CButton>
-                        <CButton size="sm"  onClick={() => {deleteTeam(item.id)}} color={getBadge('Banned')} className="mr-1">
-                            Delete
-                        </CButton>
+                            <CButtonGroup>
+                                <CButton size="sm"  onClick={() => {editTeam(item.id)}} color={getBadge('Pending')}>
+                                    <CIcon name="cil-pencil" />
+                                </CButton>
+                                <CButton size="sm"  onClick={() => {deleteTeam(item.id)}} color={getBadge('Banned')}>
+                                    <CIcon name="cil-description" />
+                                </CButton>
+                            </CButtonGroup>
                         </td>
                     )
                 }}

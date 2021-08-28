@@ -30,7 +30,7 @@ import {
   CCardText,
   CLink,
   CAlert,
-  CProgress
+  CProgress,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { DocsLink } from 'src/reusable'
@@ -38,6 +38,7 @@ import axios from 'axios'
 import { Redirect } from 'react-router-dom'
 import { useDispatch, useSelector, } from 'react-redux'
 import moment from 'moment'
+import { get } from 'enzyme/build/configuration'
 
 
 const getBadge = stage => {
@@ -73,10 +74,15 @@ const Incidents = () => {
   const [modalAdd, setModalAdd] = useState(false)
   const [modalDetail, setModalDetail] = useState(false)
   const [modalDelete, setModalDelete] = useState(false)
+  const [modalEdit, setModalEdit] = useState(false)
+  const [modalDelAttach, setModalDelAttach] = useState(false)
   const [stages, setStages] = useState([])
   const [stageOpen, setStageOpen] = useState();
+  const [attachmentId, setAttachmentId] = useState();
   const [successCreate, setSuccessCreate] = useState(0)
   const [successDelete, setSuccessDelete] = useState(0)
+  const [successUpdate, setSuccessUpdate] = useState(0)
+  const [failUpdate, setFailUpdate] =  useState(0)
   const dispatch = useDispatch();
   const [toast, addToast] = useState(0)
   const toaster = useRef()
@@ -97,21 +103,100 @@ const Incidents = () => {
   });
 
   const getIncidents = () => {
-      Axs.get('api/incident',{
-      
-      })
-      .then(function (response) {
-        // handle success
-        setStatus(response.data.status)
-        setIncidents(response.data.data)
-      })
-      .catch(function (error) {
-          console.log(error)
-      })
+    Axs.get('api/incident',{
+    
+    })
+    .then(function(response){
+      // handle success
+      setStatus(response.data.status)
+      setIncidents(response.data.data)
+    })
+    .catch(function(error){
+        console.log(error)
+    })
   }
 
-  const editIncident = () => {
-    alert('Test edit');
+  const getIncident = () => {
+    Axs.get(`api/incident/${incident.id}`, {
+      
+    })
+    .then(function(response){
+      setIncident(response.data.data)
+    })
+    .catch(function(error){
+      console.log(error)
+    })
+  }
+
+  const deleteAttachment = () => {
+    Asios.delete(`api/incident/${attachmentId}/delete`,{
+
+    })
+    .then(function(response){
+      setModalDelAttach(false)
+      getIncident()
+    })
+    .catch(function(error){
+      console.log(error)
+    })
+  }
+
+  const deleteAttachConfirm = (id) => {
+    setAttachmentId(id)
+    setModalDelAttach(true)
+  }
+
+  const EditDataAttachments = () => {
+    if(formData.incident !== undefined){
+      return (
+        <CCard>
+          <CCardHeader>
+            Attachments
+          </CCardHeader>
+          <CCardBody>
+            <CRow>
+              <CCol>
+                <table className="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th>Nama</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {
+                    incident.incidentAttachments.map((value, index) => {
+                      var link = `${url}/static/file/${value.filename}`;
+                      return (
+                        <tr key={index}>
+                          <td><CLink href={link} target="_blank">{value.alias}</CLink></td>
+                          <td><CButton color="danger" onClick={() => {deleteAttachConfirm(value.id)}}>Delete</CButton></td>
+                        </tr>
+                      )
+                    })
+                  }
+                  </tbody>
+                </table>
+              </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
+      )
+    }else{
+      return (
+        <CRow>
+          Data not found
+        </CRow>
+      )
+    }
+  }
+
+  const editIncident = (incidentData) => {
+    setIncident(incidentData)
+    setModalEdit(true)
+    setupData("incident",incidentData.text)
+    setupData("location",incidentData.location)
+    setupData("phone",incidentData.phone)
   }
 
   const deleteConfirmation = (incidentData) => {
@@ -158,6 +243,11 @@ const Incidents = () => {
     setModalDetail(!modal)
   }
 
+
+  /**
+   * menampilkan detail data
+   * @returns 
+   */
   const DataAttachments = () => {
     if(incident !== undefined){
       return (
@@ -194,6 +284,10 @@ const Incidents = () => {
     }
   }
 
+  /**
+   * menampilkan detail data
+   * @returns 
+   */
   const DataDetail = () => {
     if(incident !== undefined){
       return (
@@ -252,6 +346,9 @@ const Incidents = () => {
     }
   }
 
+  /**
+   * mengambil data stage
+   */
   const getStages = () => {
     Axs.get('api/stage',{
 
@@ -264,6 +361,9 @@ const Incidents = () => {
     })
   }
 
+  /**
+   * get stage open from database
+   */
   const getStageOpen = () => {
     Axs.get(`api/stage/1`,{
 
@@ -276,6 +376,31 @@ const Incidents = () => {
     })
   }
 
+  /**
+   * menyimaan inputan di formData
+   * @param {*} nameParam 
+   * @param {*} valueParam 
+   */
+  const setupData = (nameParam, valueParam) => {
+    setFormData({
+      name:nameParam,
+      value:valueParam
+    })
+  }
+
+  /**
+   * membersihkan inputan diform create incident
+   */
+  const clearCreate = () => {
+    setupData("incident","")
+    setupData("location","")
+    setupData("phone","")
+    setFileData();
+  }
+  /**
+   * melaporkan incident
+   * @param {*} event 
+   */
   const handleSubmit = event => {
     event.preventDefault()
     setSubmitting(true)
@@ -294,6 +419,7 @@ const Incidents = () => {
       setModalAdd(false)
       setSuccessCreate(8)
       getIncidents()
+      clearCreate()
     })
     .catch(function(error){
       console.log(error)
@@ -303,6 +429,52 @@ const Incidents = () => {
     }, 3000)
   }
 
+  /**
+   * update incident
+   * @param {*} event 
+   */
+  const handleUpdate = event => {
+    event.preventDefault()
+    setSubmitting(true)
+    const attachmentArray = new FormData()
+    attachmentArray.append("id",incident.id)
+    // update incident
+    Asios.patch(`/api/incident/${incident.id}/update`, {
+      "text":formData.incident,
+      "location":formData.location,
+      "phone":formData.phone,
+      "stage_id":stageOpen.id
+    })
+    .then(function(response){
+
+    })
+    .catch(function(error){
+      console.log(error)
+    })
+    // input attachment
+    if(fileData.length > 0){
+      // loop attachment
+      for(var u = 0; u < fileData.length; u++){
+        attachmentArray.append("file",fileData[u])
+      }
+      Axs.post(`/api/incident/attachment`, attachmentArray)
+      .then(function(response){
+        setModalEdit(false)
+        getIncidents()
+      })  
+      .catch(function(error){
+        console.log(error)
+      })
+    }
+
+    setTimeout(() => {
+      setSubmitting(false)
+    }, 3000)
+  }
+
+  /**
+   * mengambil inputan untuk proses create incident
+   */
   const handleChange = event => {
     const isCheckbox = event.target.type === 'checkbox';
     setFormData({
@@ -311,8 +483,19 @@ const Incidents = () => {
     })
   }
 
+  /**
+   * mengambil value attachment
+   * @param {*} event 
+   */
   const handleFile = event => {
     setFileData(event.target.files)
+  }
+
+  /**
+   * menampilkan modal membuat incident
+   */
+  const createIncident = () => {
+    setModalAdd(true)
   }
 
   useEffect(() => {
@@ -365,7 +548,7 @@ const Incidents = () => {
           size="lg"
         >
           <CForm onSubmit={handleSubmit} method="post">
-            <CModalHeader closeButton>
+            <CModalHeader>
               <CModalTitle>New Incident</CModalTitle>
             </CModalHeader>
             <CModalBody>
@@ -373,7 +556,7 @@ const Incidents = () => {
                 <CCol xs="12">
                   <CFormGroup>
                     <CLabel htmlFor="incident">Incident/Problem</CLabel>
-                    <CTextarea name="incident" id="incident" rows="5" onChange={handleChange}></CTextarea>
+                    <CTextarea id="incident" name="incident" rows="5" onChange={handleChange} required></CTextarea>
                   </CFormGroup>
                 </CCol>
               </CRow>
@@ -381,13 +564,13 @@ const Incidents = () => {
                 <CCol sx="6">
                   <CFormGroup>
                       <CLabel htmlFor="location">Location</CLabel>
-                      <CInput id="location" name="location" placeholder="Lokasi" onChange={handleChange} required />
+                      <CInput id="location" name="location" placeholder="Lokasi" step="1" onChange={handleChange} required />
                   </CFormGroup>
                 </CCol>
                 <CCol sx="6">
                   <CFormGroup>
                       <CLabel htmlFor="phone">Phone</CLabel>
-                      <CInput name="phone" id="phone" placeholder="Nomor Telephone" onChange={handleChange} required />
+                      <CInput id="phone" name="phone" placeholder="Nomor Telephone" onChange={handleChange} required />
                   </CFormGroup>
                 </CCol>
               </CRow>
@@ -409,7 +592,7 @@ const Incidents = () => {
                 <CCol sx="6">
                   <CFormGroup>
                     <CLabel htmlFor="lampiran">File</CLabel>
-                    <CInputFile name="file" onChange={handleFile} multiple={true} />
+                    <CInputFile value="" name="file" onChange={handleFile} multiple={true} />
                   </CFormGroup>
                 </CCol>
               </CRow>
@@ -445,6 +628,69 @@ const Incidents = () => {
               >Cancel</CButton>
             </CModalFooter>
         </CModal>
+        {/* modal edit */}
+          <CModal
+            show={modalEdit}
+            onClose={setModalEdit}
+            size="lg"
+          >
+            <CModalHeader>
+              <CModalTitle>Edit Incident</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CForm onSubmit={handleUpdate} method="post">
+                <CCard>
+                  <CCardHeader>
+                    Update Incident
+                  </CCardHeader>
+                  <CCardBody>
+                    <CRow>
+                      <CCol xs="12">
+                        <CFormGroup>
+                          <CLabel htmlFor="incident">Incident/Problem</CLabel>
+                          <CTextarea name="incident" id="incident" rows="5" onChange={handleChange} value={formData.incident || ""} required></CTextarea>
+                        </CFormGroup>
+                      </CCol>
+                    </CRow>
+                    <CRow>
+                      <CCol sx="6">
+                        <CFormGroup>
+                            <CLabel htmlFor="location">Location</CLabel>
+                            <CInput id="location" name="location" placeholder="Lokasi" step="1" onChange={handleChange} value={formData.location || ''} required />
+                        </CFormGroup>
+                      </CCol>
+                      <CCol sx="6">
+                        <CFormGroup>
+                            <CLabel htmlFor="ephone">Phone</CLabel>
+                            <CInput name="ephone" id="ephone" placeholder="Nomor Telephone" onChange={handleChange} defaultValue={formData.phone || ''} required />
+                        </CFormGroup>
+                      </CCol>
+                    </CRow>
+                    <CRow>
+                      <CCol sx="6">
+                        <CFormGroup>
+                          <CLabel htmlFor="efile">File</CLabel>
+                          <CInputFile name="efile" onChange={handleFile} multiple={true} />
+                        </CFormGroup>
+                      </CCol>
+                    </CRow>
+                    <CRow>
+                      <CCol xs="12" className="text-right">
+                        <CButton type="submit" color="primary">Update</CButton>
+                      </CCol>
+                    </CRow>
+                  </CCardBody>
+                </CCard>
+                <EditDataAttachments/>
+              </CForm>
+            </CModalBody>
+            <CModalFooter>
+              <CButton 
+                  color="secondary" 
+                  onClick={() => {setModalEdit(false)}}
+                >Cancel</CButton>
+            </CModalFooter>
+          </CModal>
         {/* modal delete */}
         <CModal
           show={modalDelete}
@@ -462,11 +708,28 @@ const Incidents = () => {
               >Cancel</CButton>
             </CModalFooter>
         </CModal>
+        {/* modal delete attachment */}
+        <CModal
+          show={modalDelAttach}
+          onClose={setModalDelAttach}
+          size="sm"  
+        >
+          <CModalBody>
+            Delete attachment ?
+          </CModalBody>
+          <CModalFooter>
+            <CButton type="submit" color="danger" onClick={() =>{deleteAttachment()}}>Delete</CButton>
+            <CButton 
+              color="secondary" 
+              onClick={() => {setModalDelAttach(false)}}
+            >Cancel</CButton>
+          </CModalFooter>
+        </CModal>
         {/* data table */}
         <CCol xs="12" lg="12">
           <CCard>
             <CCardHeader>
-              <CButton onClick={() => {setModalAdd(!modal)}} size="sm" color="primary">
+              <CButton onClick={() => {createIncident()}} size="sm" color="primary">
                 New Incident
               </CButton>
             </CCardHeader>
@@ -515,7 +778,7 @@ const Incidents = () => {
                 (item)=>(
                   <td>
                     <CButtonGroup>
-                      <CButton size="sm" onClick={() => {editIncident()}} color={getBadge('Pending')}>
+                      <CButton size="sm" onClick={() => {editIncident(item)}} color={getBadge('Pending')}>
                         <CIcon name="cil-pencil" />
                       </CButton>
                       <CButton size="sm" onClick={() => {deleteConfirmation(item)}} color={getBadge('Banned')}>

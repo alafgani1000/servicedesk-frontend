@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Link,useHistory  } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   CButton,
   CCard,
@@ -22,13 +23,16 @@ const Login = () => {
   const [username,setUsername] = useState('')
   const [password,setPassword] = useState('')
   const [status,setStatus] = useState('')
+  const dispatch = useDispatch()
+  const url = useSelector(state => state.baseUrl)
 
-  let history = useHistory();
+  const history = useHistory()
 
-  const sigIn = () => {
+  const handleSubmit = event => {
+    event.preventDefault()
     axios({
       method:'post',
-      url:'http://localhost:4001/api/auth/sign',
+      url:`http://localhost:4001/api/auth/sign`,
       data: qs.stringify({
         username:username,
         password:password
@@ -38,7 +42,9 @@ const Login = () => {
       }
     })
     .then(function (response) {
-      localStorage.setItem('shitToken',response.data.token);
+      localStorage.setItem('shitToken',response.data.token)
+      localStorage.setItem('role',response.data.role)
+      localStorage.setItem('group',response.data.group)
       setStatus(response.data.message)
       if(response.data.message === 'Success'){
         history.push('dashboard');
@@ -63,7 +69,7 @@ const Login = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm>
+                  <CForm onSubmit={handleSubmit} method="post">
                     <h1>Login</h1>
                     <p className="text-muted">Sign In to your account</p>
                     <CInputGroup className="mb-3">
@@ -84,10 +90,7 @@ const Login = () => {
                     </CInputGroup>
                     <CRow>
                       <CCol xs="6">
-                        <CButton color="primary" className="px-4" 
-                        onClick={sigIn}
-                        
-                        >Login</CButton>
+                        <CButton type="submit" color="primary" className="px-4">Login</CButton>
                       </CCol>
                       <CCol xs="6" className="text-right">
                         <CButton color="link" className="px-0">Forgot password?</CButton>

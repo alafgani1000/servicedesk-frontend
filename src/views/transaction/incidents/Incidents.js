@@ -20,10 +20,6 @@ import {
   CTextarea,
   CSelect,
   CInputFile,
-  CToast,
-  CToastBody,
-  CToastHeader,
-  CToaster,
   CButtonGroup,
   CCardFooter,
   CCardTitle,
@@ -35,10 +31,9 @@ import {
 import CIcon from '@coreui/icons-react'
 import { DocsLink } from 'src/reusable'
 import axios from 'axios'
-import { Redirect } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector, } from 'react-redux'
 import moment from 'moment'
-import { get } from 'enzyme/build/configuration'
 
 
 const getBadge = stage => {
@@ -83,10 +78,13 @@ const Incidents = () => {
   const [successDelete, setSuccessDelete] = useState(0)
   const [successUpdate, setSuccessUpdate] = useState(0)
   const [failUpdate, setFailUpdate] =  useState(0)
-  const dispatch = useDispatch();
-  const [toast, addToast] = useState(0)
-  const toaster = useRef()
+  const dispatch = useDispatch()
 
+  const history = useHistory()
+
+  /**
+   * setting base axios
+   */
   const Axs = axios.create({
     headers: {
       'token': localStorage.getItem('shitToken'),
@@ -95,6 +93,9 @@ const Incidents = () => {
     baseURL:url
   });
 
+  /**
+   * setting base axios
+   */
   const Asios = axios.create({
     headers: {
       'token': localStorage.getItem('shitToken')
@@ -102,6 +103,9 @@ const Incidents = () => {
     baseURL:url
   });
 
+  /**
+   * get data incidents
+   */
   const getIncidents = () => {
     Axs.get('api/incident',{
     
@@ -112,10 +116,13 @@ const Incidents = () => {
       setIncidents(response.data.data)
     })
     .catch(function(error){
-        console.log(error)
+      history.push('/login')
     })
   }
 
+  /**
+   * get data incident
+   */
   const getIncident = () => {
     Axs.get(`api/incident/${incident.id}`, {
       
@@ -128,6 +135,9 @@ const Incidents = () => {
     })
   }
 
+  /**
+   * delete attachment
+   */
   const deleteAttachment = () => {
     Asios.delete(`api/incident/${attachmentId}/delete`,{
 
@@ -146,6 +156,10 @@ const Incidents = () => {
     setModalDelAttach(true)
   }
 
+  /**
+   * data attachment for edit lampiran data attachment
+   * @returns 
+   */
   const EditDataAttachments = () => {
     if(formData.incident !== undefined){
       return (
@@ -191,6 +205,10 @@ const Incidents = () => {
     }
   }
 
+  /**
+   * show modal edit incident and setup variabel for formData state
+   * @param {*} incidentData 
+   */
   const editIncident = (incidentData) => {
     setIncident(incidentData)
     setModalEdit(true)
@@ -199,11 +217,19 @@ const Incidents = () => {
     setupData("phone",incidentData.phone)
   }
 
+  /**
+   * delete confirmation
+   * @param {*} incidentData 
+   */
   const deleteConfirmation = (incidentData) => {
     setIncident(incidentData)
     setModalDelete(true)
   }
 
+  /**
+   * delete incident
+   * @param {*} id 
+   */
   const deleteIncident = (id) => {
     const countAttachments =  id.incidentAttachments.length;
     var jumlahDelete = 0;
@@ -238,11 +264,14 @@ const Incidents = () => {
     }
   }
 
+  /**
+   * show modal detail incident
+   * @param {*} data 
+   */
   const detailIncident = (data) => {
     setIncident(data)
     setModalDetail(!modal)
   }
-
 
   /**
    * menampilkan detail data
@@ -357,7 +386,7 @@ const Incidents = () => {
       setStages(response.data.data)
     })
     .catch(function(error){
-      alert(error)
+      
     })
   }
 
@@ -372,7 +401,6 @@ const Incidents = () => {
       setStageOpen(response.data.data)
     })
     .catch(function(error){
-      alert(error)
     })
   }
 

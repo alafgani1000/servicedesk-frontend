@@ -162,7 +162,7 @@ const Incidents = () => {
    * @returns 
    */
   const EditDataAttachments = () => {
-    if(formData.incident !== undefined){
+    if(incident !== undefined){
       return (
         <CCard>
           <CCardHeader>
@@ -213,9 +213,9 @@ const Incidents = () => {
   const editIncident = (incidentData) => {
     setIncident(incidentData)
     setModalEdit(true)
-    setupData("incident",incidentData.text)
-    setupData("location",incidentData.location)
-    setupData("phone",incidentData.phone)
+    setupData("eincident",incidentData.text)
+    setupData("elocation",incidentData.location)
+    setupData("ephone",incidentData.phone)
   }
 
   /**
@@ -467,22 +467,21 @@ const Incidents = () => {
     setSubmitting(true)
     const attachmentArray = new FormData()
     attachmentArray.append("id",incident.id)
-    // update incident
-    Asios.patch(`/api/incident/${incident.id}/update`, {
-      "text":formData.incident,
-      "location":formData.location,
-      "phone":formData.phone,
-      "stage_id":stageOpen.id
-    })
-    .then(function(response){
-
-    })
-    .catch(function(error){
-      console.log(error)
-    })
-    // input attachment
-    if(fileData.length > 0){
-      // loop attachment
+    // update incident   
+    if(fileData !== null){
+      Asios.patch(`/api/incident/${incident.id}/update`, {
+        "text":formData.eincident,
+        "location":formData.elocation,
+        "phone":formData.ephone,
+        "stage_id":stageOpen.eid
+      })
+      .then(function(response){
+        
+      })
+      .catch(function(error){
+        console.log(error)
+      })
+      
       for(var u = 0; u < fileData.length; u++){
         attachmentArray.append("file",fileData[u])
       }
@@ -494,7 +493,22 @@ const Incidents = () => {
       .catch(function(error){
         console.log(error)
       })
+    }else{
+      Asios.patch(`/api/incident/${incident.id}/update`, {
+        "text":formData.eincident,
+        "location":formData.elocation,
+        "phone":formData.ephone,
+        "stage_id":stageOpen.eid
+      })
+      .then(function(response){
+        setModalEdit(false)
+        getIncidents()
+      })
+      .catch(function(error){
+        console.log(error)
+      })
     }
+
 
     setTimeout(() => {
       setSubmitting(false)
@@ -637,7 +651,7 @@ const Incidents = () => {
                 <CCol sx="6">
                   <CFormGroup>
                     <CLabel htmlFor="lampiran">File</CLabel>
-                    <CInputFile value="" name="file" onChange={handleFile} multiple={true} />
+                    <CInputFile name="file" onChange={handleFile} multiple={true} />
                   </CFormGroup>
                 </CCol>
               </CRow>
@@ -693,7 +707,7 @@ const Incidents = () => {
                       <CCol xs="12">
                         <CFormGroup>
                           <CLabel htmlFor="incident">Incident/Problem</CLabel>
-                          <CTextarea name="incident" id="incident" rows="5" onChange={handleChange} value={formData.incident || ""} required></CTextarea>
+                          <CTextarea name="eincident" id="eincident" rows="5" onChange={handleChange} value={formData.eincident || ""} required></CTextarea>
                         </CFormGroup>
                       </CCol>
                     </CRow>
@@ -701,13 +715,13 @@ const Incidents = () => {
                       <CCol sx="6">
                         <CFormGroup>
                             <CLabel htmlFor="location">Location</CLabel>
-                            <CInput id="location" name="location" placeholder="Lokasi" step="1" onChange={handleChange} value={formData.location || ''} required />
+                            <CInput id="elocation" name="elocation" placeholder="Lokasi" step="1" onChange={handleChange} value={formData.elocation || ''} required />
                         </CFormGroup>
                       </CCol>
                       <CCol sx="6">
                         <CFormGroup>
                             <CLabel htmlFor="ephone">Phone</CLabel>
-                            <CInput name="ephone" id="ephone" placeholder="Nomor Telephone" onChange={handleChange} defaultValue={formData.phone || ''} required />
+                            <CInput name="ephone" id="ephone" placeholder="Nomor Telephone" onChange={handleChange} defaultValue={formData.ephone || ''} required />
                         </CFormGroup>
                       </CCol>
                     </CRow>
@@ -715,7 +729,7 @@ const Incidents = () => {
                       <CCol sx="6">
                         <CFormGroup>
                           <CLabel htmlFor="efile">File</CLabel>
-                          <CInputFile name="efile" onChange={handleFile} multiple={true} />
+                          <CInputFile name="file" onChange={handleFile} multiple={true} />
                         </CFormGroup>
                       </CCol>
                     </CRow>

@@ -65,6 +65,7 @@ const Incidents = () => {
   const [incidents, setIncidents] = useState([])
   const [incident, setIncident] = useState();
   const url = useSelector(state => state.baseUrl)
+  const role = useSelector(state => state.role)
   const [modal, setModal] = useState(false)
   const [modalAdd, setModalAdd] = useState(false)
   const [modalDetail, setModalDetail] = useState(false)
@@ -532,6 +533,22 @@ const Incidents = () => {
     getStageOpen()
   },[])
  
+  const ButtonDelete = (props) => {
+    if(props.role === 'guest'){
+      if(props.stage === 'Open'){
+        return (
+          <CButton size="sm" onClick={() => {deleteConfirmation(props.item)}} color={getBadge('Banned')}>
+            <CIcon name="cil-trash" />
+          </CButton>
+        )
+      }else{
+        return ""
+      }
+    }else{
+      return ""
+    }
+  }
+
   return (
     <>
       <CRow>
@@ -809,11 +826,12 @@ const Incidents = () => {
                       <CButton size="sm" onClick={() => {editIncident(item)}} color={getBadge('Pending')}>
                         <CIcon name="cil-pencil" />
                       </CButton>
-                      <CButton size="sm" onClick={() => {deleteConfirmation(item)}} color={getBadge('Banned')}>
-                        <CIcon name="cil-trash" />
-                      </CButton>
+                      <ButtonDelete item={item} role={role} stage={item.stageIncidents.text} />
                       <CButton size="sm" onClick={() => {detailIncident(item)}} color={getBadge('Inactive')}>
                         <CIcon name="cil-description" />
+                      </CButton>
+                      <CButton size="sm" onClick={() => {detailIncident(item)}} color="primary">
+                        <CIcon name="cil-av-timer" />
                       </CButton>
                     </CButtonGroup>
                   </td>

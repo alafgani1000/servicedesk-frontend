@@ -130,6 +130,7 @@ import {
   cilWarning,
   cilPaw,
   cilDescription,
+  cilAvTimer
 } from '@coreui/icons'
 
 export const icons = Object.assign({}, {
@@ -229,7 +230,8 @@ export const icons = Object.assign({}, {
   cilXCircle,
   cilWarning,
   cilPaw,
-  cilDescription
+  cilDescription,
+  cilAvTimer
 }, {
   cifUs,
   cifBr,

@@ -17,12 +17,26 @@ import CIcon from '@coreui/icons-react'
 
 // sidebar nav config
 import navigation from './_nav'
+import navigation_guest from './_nav_guest'
+import navigation_developer from './_nav_developer'
+import navigation_technecian from './_nav_technecian'
 
 const TheSidebar = () => {
   const dispatch = useDispatch()
   const show = useSelector(state => state.sidebarShow)
-  console.log(show);
-
+  const role = useSelector(state => state.role)
+  var nav = []
+  console.log(role)
+  if(role === 'admin'){
+    nav = navigation
+  }else if(role === 'guest'){
+    nav = navigation_guest
+  }else if(role === 'developer'){
+    nav = navigation_developer
+  }else if(role === 'technician'){
+    nav = navigation_technecian
+  }
+  
   return (
     <CSidebar
       show={show}
@@ -43,7 +57,7 @@ const TheSidebar = () => {
       <CSidebarNav>
 
         <CCreateElement
-          items={navigation}
+          items={nav}
           components={{
             CSidebarNavDivider,
             CSidebarNavDropdown,

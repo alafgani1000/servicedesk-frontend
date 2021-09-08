@@ -1,7 +1,7 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 
-  const _nav =  [
+  const _nav_developer =  [
       {
         _tag: 'CSidebarNavItem',
         name: 'Dashboard',
@@ -68,4 +68,4 @@ import CIcon from '@coreui/icons-react'
       },
     ]
 
-export default _nav
+export default _nav_developer

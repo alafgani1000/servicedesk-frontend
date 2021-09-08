@@ -1,5 +1,6 @@
 import React from 'react'
 import {  Link, useHistory } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   CBadge,
   CDropdown,
@@ -11,6 +12,8 @@ import {
 import CIcon from '@coreui/icons-react'
 
 const TheHeaderDropdown = () => {
+  const nama = useSelector(state => state.nama) 
+  const role = useSelector(state => state.role)
 
   const history = useHistory()
 
@@ -37,6 +40,21 @@ const TheHeaderDropdown = () => {
         </div>
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
+        <CDropdownItem
+          header
+          tag="div"
+          color="light"
+          className="text-center"
+        >
+          <strong>Account</strong>
+        </CDropdownItem>
+        <CDropdownItem>
+          {nama}
+        </CDropdownItem>
+        <CDropdownItem>
+          {role}
+        </CDropdownItem>
+        
         <CDropdownItem
           header
           tag="div"

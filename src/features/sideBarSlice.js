@@ -1,6 +1,10 @@
 const initialState = {
   sidebarShow: 'responsive',
-  baseUrl: 'http://localhost:4001'
+  baseUrl: 'http://localhost:4001',
+  token: localStorage.getItem('shitToken'),
+  role: localStorage.getItem('role'),
+  group: localStorage.getItem('group'),
+  nama: 'No name'
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {

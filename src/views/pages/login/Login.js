@@ -32,7 +32,7 @@ const Login = () => {
     event.preventDefault()
     axios({
       method:'post',
-      url:`http://localhost:4001/api/auth/sign`,
+      url:`${url}/api/auth/sign`,
       data: qs.stringify({
         username:username,
         password:password
@@ -45,13 +45,17 @@ const Login = () => {
       localStorage.setItem('shitToken',response.data.token)
       localStorage.setItem('role',response.data.role)
       localStorage.setItem('group',response.data.group)
+      dispatch({type: 'set', role: response.data.role })
+      dispatch({type: 'set', group: response.data.group})
+      dispatch({type: 'set', token: response.data.token})
+      dispatch({type: 'set', nama: response.data.name})
       setStatus(response.data.message)
       if(response.data.message === 'Success'){
         history.push('dashboard');
       }
     })
     .catch(function (error) {
-      
+      console.log(error)
     })
     if(status === 'Success'){
       history.push('/dashboard')

@@ -34,6 +34,7 @@ import axios from 'axios'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector, } from 'react-redux'
 import moment from 'moment'
+import Swal from 'sweetalert2'
 
 
 const getBadge = stage => {
@@ -72,9 +73,13 @@ const Incidents = () => {
   const [modalDelete, setModalDelete] = useState(false)
   const [modalEdit, setModalEdit] = useState(false)
   const [modalDelAttach, setModalDelAttach] = useState(false)
-  const [stages, setStages] = useState([])
+  const [modalCreateTicket, setModalCreateTicket] = useState(false)
+  const [stages, setStages] = useState()
+  const [teams, setTeams] = useState([])
+  const [timeInterval, setTimeInterval] = useState('')
+  const [categories, setCategories] = useState([])
   const [stageOpen, setStageOpen] = useState();
-  const [attachmentId, setAttachmentId] = useState();
+  const [attachmentId, setAttachmentId] = useState()
   const [successCreate, setSuccessCreate] = useState(0)
   const [successDelete, setSuccessDelete] = useState(0)
   const [successUpdate, setSuccessUpdate] = useState(0)
@@ -362,6 +367,24 @@ const Incidents = () => {
                     <CCardText>{incident.userIncidents.name} {moment(incident.createdAt).format('DD-MM-YYYY H:m:s')}</CCardText>
                   </CFormGroup>
                 </CCol>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="ticket">Nomor Ticket:</CLabel>
+                    <CCardText>{incident.ticket}</CCardText>
+                  </CFormGroup>
+                </CCol>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="dari">Dari:</CLabel>
+                    <CCardText>{incident.sdate_ticket} {incident.stime_ticket}</CCardText>
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol>
+                  <CLabel htmlFor="sampai">Sampai:</CLabel>
+                  <CCardText>{incident.edate_ticket} {incident.etime_ticket}</CCardText>
+                </CCol>
               </CRow>
             </CForm>
           </CCardBody>
@@ -388,6 +411,36 @@ const Incidents = () => {
     })
     .catch(function(error){
       
+    })
+  }
+
+  /**
+   * mengambil data team
+   */
+  const getTeams = () => {
+    Axs.get('api/team', {
+
+    })
+    .then(function(response){
+      setTeams(response.data.data)
+    })
+    .catch(function(error){
+
+    })
+  }
+
+  /**
+   * mengambil data category
+   */
+  const getCategories = () => {
+    Axs.get('api/category',{
+
+    })
+    .then(function(response){
+      setCategories(response.data.data)
+    })
+    .catch(function(error){
+
     })
   }
 
@@ -509,7 +562,6 @@ const Incidents = () => {
       })
     }
 
-
     setTimeout(() => {
       setSubmitting(false)
     }, 3000)
@@ -545,11 +597,27 @@ const Incidents = () => {
     getIncidents()
     getStages()
     getStageOpen()
+    getTeams()
+    getCategories()
   },[])
+
+  /**
+   * show modal input ticket
+   * @param {*} incident 
+   */
+  const showModalCreateTicket = (incident) => {
+    setIncident(incident)
+    setModalCreateTicket(true)
+  }
  
+  /**
+   * 
+   * @param {*} props 
+   * @returns 
+   */
   const ButtonDelete = (props) => {
     if(props.role === 'guest'){
-      if(props.stage === 'Open'){
+      if(props.stage === 'New'){
         return (
           <CButton size="sm" onClick={() => {deleteConfirmation(props.item)}} color={getBadge('Banned')}>
             <CIcon name="cil-trash" />
@@ -561,6 +629,75 @@ const Incidents = () => {
     }else{
       return ""
     }
+  }
+
+  /**
+   * component buton input tincket
+   * @param {*} props 
+   * @returns 
+   */
+  const ButtonCreateTicket = (props) => {
+    if(props.role === 'admin'){
+      if(props.stage !== 'New'){
+        return (
+          <CButton size="sm" onClick={() => {showModalCreateTicket(props.item)}} color="primary">
+            <CIcon name="cil-av-timer" />
+          </CButton>
+        )
+      }else{
+        return ""
+      }
+    }else{
+      return ""
+    }
+  }
+
+  /**
+   * handle change category
+   * @param {*} event 
+   */
+  const handlCreateTicket = event => {
+    setFormData({
+      name: event.target.name,
+      value: event.target.value,
+    })
+    // get data category
+    if(event.target.value !== ""){
+      Axs.get(`api/category/${event.target.value}`, {
+
+      })
+      .then(function(response){
+        setTimeInterval(response.data.data.time_interval)
+      })
+      .catch(function(error){
+        console.log(error)
+      })
+    }else{
+      setTimeInterval('')
+    }
+  }
+  /**
+   * handle submit create ticket
+   * @param {*} event 
+   */
+  const handleInputTicket = event => {
+    event.preventDefault()
+    Asios.patch(`api/incident/${incident.id}/ticket`, {
+      team_id:formData.team,
+      category_id:formData.category
+    })
+    .then(function(response){
+      setModalCreateTicket(false)
+      Swal.fire({
+        title:'Notifaction',
+        width: 600,
+        padding: '3m',
+        html:'<b>NOMOR TICKET : '+response.data.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+response.data.data.sdate_ticket+' '+response.data.data.stime_ticket+' </span> Sampai <span class="badge bg-warning text-white">'+response.data.data.edate_ticket+ ' '+response.data.data.etime_ticket+'</span></b> '
+      })
+    })
+    .catch(function(error){
+      console.log(error);
+    })
   }
 
   return (
@@ -600,7 +737,7 @@ const Incidents = () => {
             />
           </CAlert>
         </CCol>
-        {/* modal */}
+        {/* modal create incident */}
         <CModal 
           show={modalAdd} 
           onClose={setModalAdd}
@@ -661,6 +798,66 @@ const Incidents = () => {
               <CButton 
                 color="secondary" 
                 onClick={() => {setModalAdd(false)}}
+              >Cancel</CButton>
+            </CModalFooter>
+          </CForm>
+        </CModal>
+
+        {/* modal create ticket */}
+        <CModal 
+          show={modalCreateTicket} 
+          onClose={setModalCreateTicket}
+          
+        >
+          <CForm onSubmit={handleInputTicket} method="post">
+            <CModalHeader>
+              <CModalTitle>Create Ticket</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CRow>
+                <CCol sx="12">
+                  <CFormGroup>
+                    <CLabel htmlFor="team">Teams</CLabel>
+                    <CSelect name="team" id="team" onChange={handleChange} required>
+                        <option value="" key="0">Please choose team</option>
+                      {
+                        teams.map((value, index) => {
+                          return <option value={ value.id } key={index}>{ value.name }</option>
+                        })
+                      }
+                    </CSelect>
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sx="12">
+                  <CFormGroup>
+                    <CLabel htmlFor="stage">Category</CLabel>
+                    <CSelect name="category" id="category" onChange={handlCreateTicket} required>
+                        <option value="" key="0">Please choose category</option>
+                      {
+                        categories.map((value, index) => {
+                          return <option value={ value.id } key={index}>{ value.name }</option>
+                        })
+                      }
+                    </CSelect>
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sx="12">
+                  <CFormGroup>
+                    <CLabel htmlFor="stage">Time</CLabel>
+                    <CInput name="timeInterval" value={timeInterval} readOnly={true} /> 
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+            </CModalBody>
+            <CModalFooter>
+              <CButton type="submit" color="primary">Save</CButton>
+              <CButton 
+                color="secondary" 
+                onClick={() => {setModalCreateTicket(false)}}
               >Cancel</CButton>
             </CModalFooter>
           </CForm>
@@ -844,9 +1041,7 @@ const Incidents = () => {
                       <CButton size="sm" onClick={() => {detailIncident(item)}} color={getBadge('Inactive')}>
                         <CIcon name="cil-description" />
                       </CButton>
-                      <CButton size="sm" onClick={() => {detailIncident(item)}} color="primary">
-                        <CIcon name="cil-av-timer" />
-                      </CButton>
+                      <ButtonCreateTicket item={item} role={role} stage={item.stageIncidents.text} />
                     </CButtonGroup>
                   </td>
                 )

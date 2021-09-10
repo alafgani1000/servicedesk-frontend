@@ -35,6 +35,7 @@ import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector, } from 'react-redux'
 import moment from 'moment'
 import Swal from 'sweetalert2'
+import io from 'socket.io-client'
 
 
 const getBadge = stage => {
@@ -594,6 +595,11 @@ const Incidents = () => {
   }
 
   useEffect(() => {
+    // const socket = io('http://localhost:4001');
+    // socket.on("jumIncident", data => {
+    //     setTimeInterval(data);
+    // });
+    
     getIncidents()
     getStages()
     getStageOpen()

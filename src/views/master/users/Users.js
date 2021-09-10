@@ -29,7 +29,6 @@ import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
 import CIcon from '@coreui/icons-react'
-import { io } from "socket.io-client"
 
 const getBadge = actions => {
   switch (actions) {
@@ -356,10 +355,6 @@ const Users = () => {
     }
 
     useEffect(() => {
-        const socket = io('http://localhost:4001');
-        socket.on("FromAPI", data => {
-            setTimeInterval(data);
-        });
         getUsers()
         getRoles()
         getTeams()
@@ -587,7 +582,7 @@ const Users = () => {
             </CCard>
             <CCard>
                 <CCardHeader>
-                Users {timeInterval}
+                Users
                 <DocsLink name="CModal"/>
                 </CCardHeader>
                 <CCardBody>

@@ -37,7 +37,6 @@ import moment from 'moment'
 import Swal from 'sweetalert2'
 import io from 'socket.io-client'
 
-
 const getBadge = stage => {
   switch (stage) {
     case 'Active': return 'success'
@@ -84,7 +83,9 @@ const Incidents = () => {
   const [successCreate, setSuccessCreate] = useState(0)
   const [successDelete, setSuccessDelete] = useState(0)
   const [successUpdate, setSuccessUpdate] = useState(0)
-  const [failUpdate, setFailUpdate] =  useState(0)
+  const [failUpdate, setFailUpdate] = useState(0)
+  const [countNewInc, setCountNewInc] = useState(0)
+  const [notifIncData, setNotifIncData] = useState()
   const dispatch = useDispatch()
 
   const history = useHistory()
@@ -595,10 +596,11 @@ const Incidents = () => {
   }
 
   useEffect(() => {
-    // const socket = io('http://localhost:4001');
-    // socket.on("jumIncident", data => {
-    //     setTimeInterval(data);
-    // });
+    const socket = io('http://localhost:4001');
+    socket.on('messageData', data => {
+      setNotifIncData(data)
+      console.log(data)
+    })
     
     getIncidents()
     getStages()
@@ -606,6 +608,11 @@ const Incidents = () => {
     getTeams()
     getCategories()
   },[])
+
+  const testMessage = () => {
+    const socket = io('http://localhost:4001');
+    socket.emit('messageData','Test Message');
+  }
 
   /**
    * show modal input ticket
@@ -998,7 +1005,10 @@ const Incidents = () => {
           </CCard>
           <CCard>
             <CCardHeader>
-              Incidents
+              Incidents { notifIncData }
+              <CButton size="sm" color="primary" onClick={ () => {testMessage()} }>
+                  Test message
+              </CButton>
               <DocsLink name="CModal"/>
             </CCardHeader>
             <CCardBody>

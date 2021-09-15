@@ -90,6 +90,8 @@ const Incidents = () => {
 
   const history = useHistory()
 
+  const socket = io(url);
+
   /**
    * setting base axios
    */
@@ -500,6 +502,7 @@ const Incidents = () => {
     // send data
     Axs.post('/api/incident/create', dataArray)
     .then(function(response){
+      socket.emit('newIncident', response.data.data)
       setModalAdd(false)
       setSuccessCreate(8)
       getIncidents()
@@ -596,7 +599,6 @@ const Incidents = () => {
   }
 
   useEffect(() => {
-    const socket = io('http://localhost:4001');
     socket.on('messageData', data => {
       setNotifIncData(data)
       console.log(data)
@@ -610,7 +612,6 @@ const Incidents = () => {
   },[])
 
   const testMessage = () => {
-    const socket = io('http://localhost:4001');
     socket.emit('messageData','Test Message');
   }
 
@@ -707,10 +708,23 @@ const Incidents = () => {
         padding: '3m',
         html:'<b>NOMOR TICKET : '+response.data.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+response.data.data.sdate_ticket+' '+response.data.data.stime_ticket+' </span> Sampai <span class="badge bg-warning text-white">'+response.data.data.edate_ticket+ ' '+response.data.data.etime_ticket+'</span></b> '
       })
+      // socket io notif
+      socket.emit('userSet',{
+        data:response.data.data.ticket,
+        uniqueId:response.data.dataToken.token
+      });
     })
     .catch(function(error){
       console.log(error);
     })
+  }
+
+
+  /**
+   * notifikasi ketika membuat laporan adanya incident/problem
+   */
+  const newIncidentEmit = () => {
+    
   }
 
   return (

@@ -4,7 +4,7 @@ const initialState = {
   token: localStorage.getItem('shitToken'),
   role: localStorage.getItem('role'),
   group: localStorage.getItem('group'),
-  nama: 'No name'
+  nama: localStorage.getItem('name')
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {

@@ -84,13 +84,9 @@ const Incidents = () => {
   const [successDelete, setSuccessDelete] = useState(0)
   const [successUpdate, setSuccessUpdate] = useState(0)
   const [failUpdate, setFailUpdate] = useState(0)
-  const [countNewInc, setCountNewInc] = useState(0)
-  const [notifIncData, setNotifIncData] = useState()
   const dispatch = useDispatch()
 
   const history = useHistory()
-
-  const socket = io(url);
 
   /**
    * setting base axios
@@ -502,6 +498,7 @@ const Incidents = () => {
     // send data
     Axs.post('/api/incident/create', dataArray)
     .then(function(response){
+      const socket = io(url);
       socket.emit('newIncident', response.data.data)
       setModalAdd(false)
       setSuccessCreate(8)
@@ -598,22 +595,13 @@ const Incidents = () => {
     setModalAdd(true)
   }
 
-  useEffect(() => {
-    socket.on('messageData', data => {
-      setNotifIncData(data)
-      console.log(data)
-    })
-    
+  useEffect(() => { 
     getIncidents()
     getStages()
     getStageOpen()
     getTeams()
     getCategories()
   },[])
-
-  const testMessage = () => {
-    socket.emit('messageData','Test Message');
-  }
 
   /**
    * show modal input ticket
@@ -709,6 +697,7 @@ const Incidents = () => {
         html:'<b>NOMOR TICKET : '+response.data.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+response.data.data.sdate_ticket+' '+response.data.data.stime_ticket+' </span> Sampai <span class="badge bg-warning text-white">'+response.data.data.edate_ticket+ ' '+response.data.data.etime_ticket+'</span></b> '
       })
       // socket io notif
+      const socket = io(url);
       socket.emit('userSet',{
         data:response.data.data.ticket,
         uniqueId:response.data.dataToken.token
@@ -717,14 +706,6 @@ const Incidents = () => {
     .catch(function(error){
       console.log(error);
     })
-  }
-
-
-  /**
-   * notifikasi ketika membuat laporan adanya incident/problem
-   */
-  const newIncidentEmit = () => {
-    
   }
 
   return (
@@ -1019,10 +1000,7 @@ const Incidents = () => {
           </CCard>
           <CCard>
             <CCardHeader>
-              Incidents { notifIncData }
-              <CButton size="sm" color="primary" onClick={ () => {testMessage()} }>
-                  Test message
-              </CButton>
+              Incidents
               <DocsLink name="CModal"/>
             </CCardHeader>
             <CCardBody>

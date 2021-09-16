@@ -45,6 +45,7 @@ const Login = () => {
       localStorage.setItem('shitToken',response.data.token)
       localStorage.setItem('role',response.data.role)
       localStorage.setItem('group',response.data.group)
+      localStorage.setItem('name',response.data.name)
       dispatch({type: 'set', role: response.data.role })
       dispatch({type: 'set', group: response.data.group})
       dispatch({type: 'set', token: response.data.token})

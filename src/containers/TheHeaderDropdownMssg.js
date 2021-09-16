@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CBadge,
   CDropdown,
@@ -8,9 +8,44 @@ import {
   CImg
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import { useSelector } from 'react-redux'
+import io from 'socket.io-client'
+import axios from 'axios'
 
 const TheHeaderDropdownMssg = () => {
-  const itemsCount = 4
+  const [notifNewIncident, setNotifNewIncident] = useState([])
+  const url = useSelector(state => state.baseUrl)
+  const token = useSelector(state => state.token)
+  const itemsCount = notifNewIncident.length
+
+  /**
+   * setting base axios
+   */
+  const Axios = axios.create({
+    headers: {
+      'token': token,
+      'Content-Type': 'multipart/form-data'
+    },
+    baseURL:url
+  });
+
+  useEffect(() => {
+    Axios.get('api/incident',{
+    })
+    .then(function(response){
+      
+    })
+    .catch(function(error){
+      console.log(error)
+    })
+    
+    const socket = io(url)
+    socket.on(token, data => {
+      setNotifNewIncident(data.notifications)
+      console.log(data)
+    })
+  })
+  
   return (
     <CDropdown
       inNav
@@ -18,7 +53,8 @@ const TheHeaderDropdownMssg = () => {
       direction="down"
     >
       <CDropdownToggle className="c-header-nav-link" caret={false}>
-        <CIcon name="cil-envelope-open" /><CBadge shape="pill" color="info">{itemsCount}</CBadge>
+        {/* <CIcon name="cil-envelope-open" /><CBadge shape="pill" color="info">{itemsCount}</CBadge> */}
+        <CIcon name="cil-bell" /><CBadge shape="pill" color="danger">{itemsCount}</CBadge>
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownItem
@@ -53,71 +89,6 @@ const TheHeaderDropdownMssg = () => {
           </div>
         </CDropdownItem>
 
-        <CDropdownItem href="#">
-          <div className="message">
-            <div className="pt-3 mr-3 float-left">
-              <div className="c-avatar">
-                <CImg
-                  src={'avatars/6.jpg'}
-                  className="c-avatar-img"
-                  alt="admin@bootstrapmaster.com"
-                />
-                <span className="c-avatar-status bg-warning"></span>
-              </div>
-            </div>
-            <div>
-              <small className="text-muted">Jane Dovve</small>
-              <small className="text-muted float-right mt-1">5 minutes ago</small>
-            </div>
-            <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-            <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-            </div>
-          </div>
-        </CDropdownItem>
-
-        <CDropdownItem href="#">
-          <div className="message">
-            <div className="pt-3 mr-3 float-left">
-              <div className="c-avatar">
-                <CImg
-                  src={'avatars/5.jpg'}
-                  className="c-avatar-img"
-                  alt="admin@bootstrapmaster.com"
-                />
-                <span className="c-avatar-status bg-danger"></span>
-              </div>
-            </div>
-            <div>
-              <small className="text-muted">Janet Doe</small>
-              <small className="text-muted float-right mt-1">1:52 PM</small>
-            </div>
-            <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-            <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-            </div>
-          </div>
-        </CDropdownItem>
-
-        <CDropdownItem href="#">
-          <div className="message">
-            <div className="pt-3 mr-3 float-left">
-              <div className="c-avatar">
-                <CImg
-                  src={'avatars/4.jpg'}
-                  className="c-avatar-img"
-                  alt="admin@bootstrapmaster.com"
-                />
-                <span className="c-avatar-status bg-info"></span>
-              </div>
-            </div>
-            <div>
-              <small className="text-muted">Joe Doe</small>
-              <small className="text-muted float-right mt-1">4:03 AM</small>
-            </div>
-            <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-            <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-            </div>
-          </div>
-        </CDropdownItem>
         <CDropdownItem href="#" className="text-center border-top"><strong>View all messages</strong></CDropdownItem>
       </CDropdownMenu>
     </CDropdown>

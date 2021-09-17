@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CHeader,
@@ -12,6 +12,8 @@ import {
   CLink
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import axios from 'axios'
+import io from 'socket.io-client'
 
 // routes config
 import routes from '../routes'
@@ -24,8 +26,11 @@ import {
 }  from './index'
 
 const TheHeader = () => {
+  const [notifications, setNotifications] = useState([])
   const dispatch = useDispatch()
   const sidebarShow = useSelector(state => state.sidebarShow)
+  const url = useSelector(state => state.baseUrl)
+  const token = useSelector(state => state.token)
 
   const toggleSidebar = () => {
     const val = [true, 'responsive'].includes(sidebarShow) ? false : 'responsive'
@@ -36,6 +41,31 @@ const TheHeader = () => {
     const val = [false, 'responsive'].includes(sidebarShow) ? true : 'responsive'
     dispatch({type: 'set', sidebarShow: val})
   }
+
+  const Axios = axios.create({
+    headers: {
+      'token': token,
+      'Content-Type': 'multipart/form-data'
+    },
+    baseURL:url
+  });
+
+  useEffect(() => {    
+    Axios.get('api/notifications/incidents',{
+  
+    })
+    .then(function(response){
+      setNotifications(response.data.data)
+    })
+    .catch(function(error){
+      console.log(error)
+    })
+
+    const socket = io(url)
+    socket.on(token, data => {
+      setNotifications(data.notifications)
+    })
+  }, [])
 
   return (
     <CHeader withSubheader>
@@ -66,9 +96,9 @@ const TheHeader = () => {
       </CHeaderNav>
 
       <CHeaderNav className="px-3">
-        <TheHeaderDropdownNotif/>
-        <TheHeaderDropdownTasks/>
-        <TheHeaderDropdownMssg/>
+        {/* <TheHeaderDropdownNotif/> */}
+        {/* <TheHeaderDropdownTasks/> */}
+        <TheHeaderDropdownMssg notifications={notifications} />
         <TheHeaderDropdown/>
       </CHeaderNav>
 

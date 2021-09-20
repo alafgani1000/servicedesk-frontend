@@ -29,6 +29,7 @@ const initialState = {
   group: localStorage.getItem('group'),
   nama: localStorage.getItem('name'),
   notifIncident: dataNotifIncident,
+  incidentSearch:""
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {

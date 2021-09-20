@@ -8,8 +8,43 @@ import {
   CImg
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router'
+import axios from 'axios'
 
 const TheHeaderDropdownMssg = (props) => {
+  const dispatch = useDispatch();
+  const [dataNotif, setDataNotif] = useState({})
+  const url =  useSelector(state => state.baseUrl)
+  const history = useHistory()
+
+  const Axios = axios.create({
+    headers: {
+      'token': localStorage.getItem('shitToken'),
+      'Content-Type': 'multipart/form-data'
+    },
+    baseURL:url
+  });
+
+  const setIncidentSearch = (data) => {
+    const dataJson = JSON.parse(data.data)
+    dispatch({type: 'set', incidentSearch: dataJson.text})
+    history.push('/transaction/incidents')
+    readNotif(data)
+  }
+
+  const readNotif = (data) => {
+    Axios.patch(`api/notifications/${data.id}/read`,{
+
+    })
+    .then(function(data){
+
+    })
+    .catch(function(error){
+
+    })
+  }
+
   return (
     <>
     <CDropdown
@@ -31,8 +66,9 @@ const TheHeaderDropdownMssg = (props) => {
         </CDropdownItem>
         {
           props.notifications.map((value, index) => {
+            const data = JSON.parse(value.data)
             return (
-              <CDropdownItem href="#" key={index}>
+              <CDropdownItem href="#" key={index} onClick={() => { setIncidentSearch(value) }}>
                 <div className="message">
                   <div className="pt-3 mr-3 float-left">
                     <div className="c-avatar">
@@ -52,7 +88,9 @@ const TheHeaderDropdownMssg = (props) => {
                     <CBadge color="success" className="ml-2">{ value.stage }</CBadge>
                   </div>
                   <div className="small text-muted text-truncate">
-                    {value.data}
+                    {
+                      data.text
+                    }
                   </div>
                 </div>
               </CDropdownItem>

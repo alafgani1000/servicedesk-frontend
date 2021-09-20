@@ -55,7 +55,7 @@ const formReducer = (state, event) => {
  }
 
 // const fields = ['text','location', 'phone','category','stage','startDate','endDate','createdAt','updatedAt', 'actions']
-const fields = ['text','location', 'phone','stage','startDate','endDate','createdAt','updatedAt', 'actions']
+const fields = ['text','user','location', 'phone','stage','startDate','endDate','createdAt','updatedAt', 'actions']
 
 const Incidents = () => {
   const [formData, setFormData] =  useReducer(formReducer, {})
@@ -65,8 +65,6 @@ const Incidents = () => {
   const [status, setStatus] = useState(null)
   const [incidents, setIncidents] = useState([])
   const [incident, setIncident] = useState();
-  const url = useSelector(state => state.baseUrl)
-  const role = useSelector(state => state.role)
   const [modal, setModal] = useState(false)
   const [modalAdd, setModalAdd] = useState(false)
   const [modalDetail, setModalDetail] = useState(false)
@@ -84,6 +82,11 @@ const Incidents = () => {
   const [successDelete, setSuccessDelete] = useState(0)
   const [successUpdate, setSuccessUpdate] = useState(0)
   const [failUpdate, setFailUpdate] = useState(0)
+  const [stateIncidentSearch, setStateIncidentSearch] = useState("")
+
+  const url = useSelector(state => state.baseUrl)
+  const role = useSelector(state => state.role)
+  const incidentSearch = useSelector(state => state.incidentSearch)
   const dispatch = useDispatch()
 
   const history = useHistory()
@@ -596,6 +599,7 @@ const Incidents = () => {
   }
 
   useEffect(() => { 
+    // setStateIncidentSearch(incidentSearch)
     getIncidents()
     getStages()
     getStageOpen()
@@ -1011,6 +1015,7 @@ const Incidents = () => {
               pagination
               columnFilter
               tableFilter
+              tableFilterValue={incidentSearch}
               sorter
               itemsPerPageSelect
               scopedSlots = {{
@@ -1020,7 +1025,11 @@ const Incidents = () => {
                 ),
                 'stage':
                 (item)=>(
-                  <td>{item.stageIncidents.text}</td>
+                  <td><CBadge className="primary">{item.stageIncidents.text}</CBadge></td>
+                ),
+                'user':
+                (item)=>(
+                  <td>{item.userIncidents.name}</td>
                 ),
                 'startDate':
                 (item)=>(

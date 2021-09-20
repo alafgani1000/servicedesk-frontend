@@ -26,9 +26,9 @@ import {
 }  from './index'
 
 const TheHeader = () => {
-  const [notifications, setNotifications] = useState([])
   const dispatch = useDispatch()
   const sidebarShow = useSelector(state => state.sidebarShow)
+  const notifications = useSelector(state => state.notifications)
   const url = useSelector(state => state.baseUrl)
   const token = useSelector(state => state.token)
 
@@ -55,15 +55,15 @@ const TheHeader = () => {
   
     })
     .then(function(response){
-      setNotifications(response.data.data)
+      dispatch({type: 'set', notifications: response.data.data})
     })
     .catch(function(error){
       console.log(error)
     })
-
+   
     const socket = io(url)
     socket.on(token, data => {
-      setNotifications(data.notifications)
+      dispatch({type: 'set', notifications: data.notifications})
     })
   }, [])
 

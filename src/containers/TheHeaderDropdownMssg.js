@@ -16,6 +16,7 @@ const TheHeaderDropdownMssg = (props) => {
   const dispatch = useDispatch();
   const [dataNotif, setDataNotif] = useState({})
   const url =  useSelector(state => state.baseUrl)
+
   const history = useHistory()
 
   const Axios = axios.create({
@@ -34,15 +35,13 @@ const TheHeaderDropdownMssg = (props) => {
   }
 
   const readNotif = (data) => {
-    Axios.patch(`api/notifications/${data.id}/read`,{
-
-    })
-    .then(function(data){
-
-    })
-    .catch(function(error){
-
-    })
+    Axios.patch(`api/notifications/${data.id}/read`,{})
+      .then(function(data){})
+        
+      Axios.get('api/notifications/incidents',{})
+      .then(function(response){
+        dispatch({type: 'set', notifications: response.data.data})
+      })
   }
 
   return (

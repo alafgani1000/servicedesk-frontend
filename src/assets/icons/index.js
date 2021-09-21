@@ -54,6 +54,7 @@ import {
   cilCloudDownload,
   cilChartPie,
   cilCheck,
+  cilCheckAlt,
   cilChevronBottom,
   cilChevronLeft,
   cilChevronRight,
@@ -231,7 +232,8 @@ export const icons = Object.assign({}, {
   cilWarning,
   cilPaw,
   cilDescription,
-  cilAvTimer
+  cilAvTimer,
+  cilCheckAlt,
 }, {
   cifUs,
   cifBr,

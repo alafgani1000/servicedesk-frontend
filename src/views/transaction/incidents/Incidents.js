@@ -55,7 +55,7 @@ const formReducer = (state, event) => {
  }
 
 // const fields = ['text','location', 'phone','category','stage','startDate','endDate','createdAt','updatedAt', 'actions']
-const fields = ['text','user','location', 'phone','stage','startDate','endDate','createdAt','updatedAt', 'actions']
+const fields = ['text','user','location', 'phone','stage', 'category', 'team', 'startDate','endDate','createdAt', 'actions']
 
 const Incidents = () => {
   const [formData, setFormData] =  useReducer(formReducer, {})
@@ -72,6 +72,7 @@ const Incidents = () => {
   const [modalEdit, setModalEdit] = useState(false)
   const [modalDelAttach, setModalDelAttach] = useState(false)
   const [modalCreateTicket, setModalCreateTicket] = useState(false)
+  const [modalResolve, setModalResolve] = useState(false)
   const [stages, setStages] = useState()
   const [teams, setTeams] = useState([])
   const [timeInterval, setTimeInterval] = useState('')
@@ -80,6 +81,7 @@ const Incidents = () => {
   const [attachmentId, setAttachmentId] = useState()
   const [successCreate, setSuccessCreate] = useState(0)
   const [successDelete, setSuccessDelete] = useState(0)
+  const [resolveText, setResolveText] = useState("")
   const [successUpdate, setSuccessUpdate] = useState(0)
   const [failUpdate, setFailUpdate] = useState(0)
   const [stateIncidentSearch, setStateIncidentSearch] = useState("")
@@ -615,6 +617,11 @@ const Incidents = () => {
     setIncident(incident)
     setModalCreateTicket(true)
   }
+
+  const showModalResolve = (incident) => {
+    setIncident(incident)
+    setModalResolve(true)
+  }
  
   /**
    * 
@@ -636,6 +643,7 @@ const Incidents = () => {
       return ""
     }
   }
+  
 
   /**
    * component buton input tincket
@@ -643,8 +651,8 @@ const Incidents = () => {
    * @returns 
    */
   const ButtonCreateTicket = (props) => {
-    if(props.role === 'admin'){
-      if(props.stage !== 'New'){
+    if(props.role === "admin"){
+      if(props.stage === "New"){
         return (
           <CButton size="sm" onClick={() => {showModalCreateTicket(props.item)}} color="primary">
             <CIcon name="cil-av-timer" />
@@ -656,6 +664,61 @@ const Incidents = () => {
     }else{
       return ""
     }
+  }
+
+  const ButtonResolve = (props) => {
+    if(props.role === "technician"){
+      if(props.stage === "Open"){
+        return (
+          <CButton size="sm" color="success" onClick={() => {showModalResolve(props.item)}}>
+            <CIcon name="cil-check-circle"/>
+          </CButton>
+        )
+      }else{
+        return ""
+      }
+    }else{
+      return ""
+    }
+  }
+
+  const Stage = (props) => {
+    let color = "info"
+    if(props.stage === "New"){
+      color = "info"
+    }else if(props.stage === "Open"){
+      color = "warning"
+    }else if(props.stage === "Resolve"){
+      color = "primary"
+    }else if(props.stage === "Close"){
+      color = "success"
+    }else if(props.stage === "Archive"){
+      color = "seccondary"
+    }
+    return (
+      <CBadge color={color}>{props.stage}</CBadge>
+    )
+  }
+
+  const Category = (props) => {
+    let bgcolor = ""
+    let color = ""
+    if(props.category === 'GOLD'){
+      bgcolor = "#DAA520"
+      color = "white"
+    }else if(props.category === 'SILVER'){
+      bgcolor = "#C0C0C0"
+      color = "white"
+    }else if(props.category === "BRONZE"){
+      bgcolor = "#cd7f32"
+      color= "white"
+    }else if(props.category === "EARTH"){
+      bgcolor = "#70483c"
+      color = "white"
+    }
+    return (
+      <CBadge style={{'backgroundColor':bgcolor, 'color':color}}>{props.category}</CBadge>
+    )
   }
 
   /**
@@ -702,13 +765,38 @@ const Incidents = () => {
       })
       // socket io notif
       const socket = io(url);
-      socket.emit('userSet',{
-        data:response.data.data.ticket,
-        uniqueId:response.data.dataToken.token
-      });
+      socket.emit('inputTicket', response.data.notifId);
     })
     .catch(function(error){
       console.log(error);
+    })
+  }
+
+  /**
+   * handle resolve incident
+   * @param {*} event 
+   */
+  const handleResolve = event => {
+    event.preventDefault()
+    Asios.patch(`api/incident/${incident.id}/resolve`, {
+      'resolve_text':resolveText
+    })
+    .then(function(response){
+      setModalResolve(false)
+      // notification
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Resolved',
+        showConfirmButton: false,
+        timer: 1500
+      })
+      // send socket io
+      const socket = io(url)
+      socket.emit('resolveIncident', response.data.notifId);
+    })
+    .catch(function(error){
+      console.log(error)
     })
   }
 
@@ -749,6 +837,35 @@ const Incidents = () => {
             />
           </CAlert>
         </CCol>
+        {/* modal resolve incident */}
+        <CModal
+          show={modalResolve}
+          onClose={setModalResolve}
+          size=""
+        >
+          <CForm onSubmit={handleResolve} method="post">
+            <CModalHeader>
+              <CModalTitle>Resolve</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CRow>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="incident">Description resolve</CLabel>
+                    <CTextarea id="resolve_text" name="resolve_text" rows="5" onChange={event => setResolveText(event.target.value)} required></CTextarea>
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CModalFooter>
+                <CButton type="submit" color="primary">Save</CButton>
+                <CButton 
+                  color="secondary" 
+                  onClick={() => {setModalResolve(false)}}
+                >Cancel</CButton>
+              </CModalFooter>
+            </CModalBody>
+          </CForm>
+        </CModal>
         {/* modal create incident */}
         <CModal 
           show={modalAdd} 
@@ -1019,13 +1136,21 @@ const Incidents = () => {
               sorter
               itemsPerPageSelect
               scopedSlots = {{
-                'category':
-                (item)=>(
-                  <td>{item.categoryIncidents.name}</td>
-                ),
                 'stage':
                 (item)=>(
-                  <td><CBadge className="primary">{item.stageIncidents.text}</CBadge></td>
+                  <td>
+                    <Stage stage={item.stageIncidents.text}/>
+                  </td>
+                ),
+                'category':
+                (item)=>(
+                  <td>
+                    <Category category={item.categoryIncidents.name}/>
+                  </td>
+                ),
+                'team':
+                (item)=>(
+                  <td>{item.teamIncidents.name}</td>
                 ),
                 'user':
                 (item)=>(
@@ -1051,7 +1176,7 @@ const Incidents = () => {
                 (item)=>(
                   <td>
                     <CButtonGroup>
-                      <CButton size="sm" onClick={() => {editIncident(item)}} color={getBadge('Pending')}>
+                      <CButton className="text-white" size="sm" onClick={() => {editIncident(item)}} color={getBadge('Pending')}>
                         <CIcon name="cil-pencil" />
                       </CButton>
                       <ButtonDelete item={item} role={role} stage={item.stageIncidents.text} />
@@ -1059,6 +1184,7 @@ const Incidents = () => {
                         <CIcon name="cil-description" />
                       </CButton>
                       <ButtonCreateTicket item={item} role={role} stage={item.stageIncidents.text} />
+                      <ButtonResolve item={item} role={role} stage={item.stageIncidents.text} />
                     </CButtonGroup>
                   </td>
                 )

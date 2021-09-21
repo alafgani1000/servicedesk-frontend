@@ -67,7 +67,7 @@ const TheHeaderDropdownMssg = (props) => {
           props.notifications.map((value, index) => {
             const data = JSON.parse(value.data)
             return (
-              <CDropdownItem href="#" key={index} onClick={() => { setIncidentSearch(value) }}>
+              <CDropdownItem href="#" key={index} onClick={() => { setIncidentSearch(value) }} style={{ minWidth:'200px' }} >
                 <div className="message">
                   <div className="pt-3 mr-3 float-left">
                     <div className="c-avatar">
@@ -84,9 +84,9 @@ const TheHeaderDropdownMssg = (props) => {
                   </div>
                   <div className="font-weight-bold">
                     <span className="fa fa-exclamation text-danger"></span> { value.tableName.charAt(0).toUpperCase() + value.tableName.slice(1) } 
-                    <CBadge color="success" className="ml-2">{ value.stage }</CBadge>
+                    <CBadge color="success" className="ml-2 mr-2">{ value.stage }</CBadge>
                   </div>
-                  <div className="small text-muted text-truncate">
+                  <div className="small text-muted text-truncate mr-2">
                     {
                       data.text
                     }

@@ -290,10 +290,22 @@ const Incidents = () => {
    */
   const DataAttachments = () => {
     if(incident !== undefined){
+      let color = ''
+      if(incident.stageIncidents.text === 'New'){
+        color = 'info'
+      }else if(incident.stageIncidents.text === 'Open'){
+        color = 'warning'
+      }else if(incident.stageIncidents.text === 'Resolve'){
+        color = 'primary'
+      }else if(incident.stageIncidents.text === 'Close'){
+        color = 'success'
+      }else if(incident.stageIncidents.text === 'Archive'){
+        color = 'secondary'
+      }
       return (
-        <CCard>
+        <CCard style={{boxShadow:'1px 1px 1px 1px silver'}}>
           <CCardHeader>
-            Attachments
+            <h5>Attachments</h5>
           </CCardHeader>
           <CCardBody>
             <CForm>
@@ -330,17 +342,29 @@ const Incidents = () => {
    */
   const DataDetail = () => {
     if(incident !== undefined){
+      let color = ''
+      if(incident.stageIncidents.text === 'New'){
+        color = 'info'
+      }else if(incident.stageIncidents.text === 'Open'){
+        color = 'warning'
+      }else if(incident.stageIncidents.text === 'Resolve'){
+        color = 'primary'
+      }else if(incident.stageIncidents.text === 'Close'){
+        color = 'success'
+      }else if(incident.stageIncidents.text === 'Archive'){
+        color = 'secondary'
+      }
       return (
-        <CCard>
+        <CCard style={{boxShadow:'1px 1px 1px 1px silver'}}>
           <CCardHeader>
-            Incident
+            <h5>Incident</h5>
           </CCardHeader>
           <CCardBody>
               <CForm>
                 <CRow>
                   <CCol>
                     <CFormGroup>
-                      <CLabel htmlFor="incident">Incident/Problem:</CLabel>
+                      <CLabel htmlFor="incident" style={{fontWeight:'bold'}}>Incident/Problem:</CLabel>
                       <CCardText>{incident.text}</CCardText>
                     </CFormGroup>
                   </CCol>
@@ -361,7 +385,7 @@ const Incidents = () => {
                   <CCol>
                     <CFormGroup>
                       <CLabel htmlFor="stage">Stage:</CLabel>
-                      <CCardText>{incident.stageIncidents.text}</CCardText>
+                      <CCardText><CBadge color={color} style={{fontWeight:'bolder', fontSize:'12px'}}>{incident.stageIncidents.text}</CBadge></CCardText>
                     </CFormGroup>
                   </CCol>
               </CRow>
@@ -369,27 +393,77 @@ const Incidents = () => {
                 <CCol>
                   <CFormGroup>
                     <CLabel htmlFor="created">Created By:</CLabel>
-                    <CCardText>{incident.userIncidents.name} {moment(incident.createdAt).format('DD-MM-YYYY H:m:s')}</CCardText>
+                    <CCardText><CBadge color="secondary" style={{fontWeight:'bolder', fontSize:'12px'}} >{incident.userIncidents.name.charAt(0).toUpperCase() + incident.userIncidents.name.slice(1)} {moment(incident.createdAt).format('DD-MM-YYYY H:m:s')}</CBadge></CCardText>
                   </CFormGroup>
                 </CCol>
                 <CCol>
                   <CFormGroup>
-                    <CLabel htmlFor="ticket">Nomor Ticket:</CLabel>
-                    <CCardText>{incident.ticket}</CCardText>
+                    <CLabel htmlFor="ticket">Ticket:</CLabel>
+                    <CCardText><CBadge color="secondary" style={{fontSize:'12px'}}>{incident.ticket}</CBadge></CCardText>
                   </CFormGroup>
                 </CCol>
                 <CCol>
                   <CFormGroup>
-                    <CLabel htmlFor="dari">Dari:</CLabel>
-                    <CCardText>{incident.sdate_ticket} {incident.stime_ticket}</CCardText>
+                    <CLabel htmlFor="from">From:</CLabel>
+                    <CCardText><CBadge color="secondary" style={{fontSize:'12px'}}>{incident.sdate_ticket} {incident.stime_ticket}</CBadge></CCardText>
                   </CFormGroup>
                 </CCol>
               </CRow>
               <CRow>
                 <CCol>
-                  <CLabel htmlFor="sampai">Sampai:</CLabel>
-                  <CCardText>{incident.edate_ticket} {incident.etime_ticket}</CCardText>
+                  <CFormGroup>
+                    <CLabel htmlFor="until">Until:</CLabel>
+                    <CCardText><CBadge color="secondary" style={{fontSize:'12px'}}>{incident.edate_ticket} {incident.etime_ticket}</CBadge></CCardText>
+                  </CFormGroup>
                 </CCol>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="resolve">Resolve Date:</CLabel>
+                    <CCardText><CBadge color="secondary" style={{fontSize:'12px'}}>{incident.resolve_date} {incident.resolve_time}</CBadge></CCardText>
+                  </CFormGroup>
+                </CCol>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="close">Close:</CLabel>
+                    <CCardText><CBadge color="secondary" style={{fontSize:'12px'}}>{incident.close_date} {incident.close_time}</CBadge></CCardText>
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="resdesc">Category:</CLabel>
+                    <CCardText>{(incident.categoryIncidents === null) ? "" : incident.categoryIncidents.name} ({(incident.categoryIncidents === null) ? "" : incident.categoryIncidents.time_interval} Jam)</CCardText>
+                  </CFormGroup>
+                </CCol>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="team">Team IT:</CLabel>
+                    <CCardText>{(incident.teamIncidents === null) ? "" : incident.teamIncidents.name}</CCardText>
+                  </CFormGroup>
+                </CCol>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="team">Technician:</CLabel>
+                    <CCardText>{(incident.technicianIncident === null) ? "" : incident.technicianIncident.name.charAt(0).toUpperCase() + incident.technicianIncident.name.slice(1)}</CCardText>
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol>
+                  <CFormGroup>
+                    <CLabel htmlFor="resdesc">Resolve Description:</CLabel>
+                    <CCardText>{incident.resolve_text}</CCardText>
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CFormGroup>
+                  <CCol>
+                      <CLabel htmlFor="timeresolve">Resolve Time:</CLabel>
+                      <CCardText>{((incident.interval_resolve - (incident.interval_resolve % 60)) / 60) } Hours {incident.interval_resolve  % 60} Minutes</CCardText>
+                  </CCol>
+                </CFormGroup>
               </CRow>
             </CForm>
           </CCardBody>
@@ -508,7 +582,6 @@ const Incidents = () => {
       setModalAdd(false)
       setSuccessCreate(8)
       getIncidents()
-      clearCreate()
     })
     .catch(function(error){
       console.log(error)
@@ -598,6 +671,7 @@ const Incidents = () => {
    */
   const createIncident = () => {
     setModalAdd(true)
+    setFileData(null)
   }
 
   useEffect(() => { 
@@ -666,6 +740,11 @@ const Incidents = () => {
     }
   }
 
+  /**
+   * component button resolve
+   * @param {*} props 
+   * @returns 
+   */
   const ButtonResolve = (props) => {
     if(props.role === "technician"){
       if(props.stage === "Open"){
@@ -682,6 +761,11 @@ const Incidents = () => {
     }
   }
 
+  /**
+   * stage component
+   * @param {*} props 
+   * @returns 
+   */
   const Stage = (props) => {
     let color = "info"
     if(props.stage === "New"){
@@ -700,6 +784,11 @@ const Incidents = () => {
     )
   }
 
+  /**
+   * category component
+   * @param {*} props 
+   * @returns 
+   */
   const Category = (props) => {
     let bgcolor = ""
     let color = ""
@@ -719,6 +808,27 @@ const Incidents = () => {
     return (
       <CBadge style={{'backgroundColor':bgcolor, 'color':color}}>{props.category}</CBadge>
     )
+  }
+
+  /**
+   * button close component
+   * @param {*} props 
+   * @returns 
+   */
+  const ButtonClose = (props) => {
+    if(props.role === "admin"){
+      if(props.stage === "Resolve"){
+        return (
+          <CButton size="sm" color="danger" onClick={() => {handleClose(props.item)}}>
+            <CIcon name="cil-book"/>
+          </CButton>
+        )   
+      }else{
+        return ""
+      }
+    }else{
+      return ""
+    }
   }
 
   /**
@@ -745,6 +855,7 @@ const Incidents = () => {
       setTimeInterval('')
     }
   }
+
   /**
    * handle submit create ticket
    * @param {*} event 
@@ -772,6 +883,23 @@ const Incidents = () => {
     })
   }
 
+  const Toast =  Swal.mixin({
+    toast:true,
+    position:'top-end',
+    showConfirmButton:false,
+    time:3000,
+    timerProgressBar:true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer)
+      toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+  })
+
+  const resfresh = () => {
+    getIncidents()
+    dispatch({type: 'set', incidentSearch: ''})
+  }
+
   /**
    * handle resolve incident
    * @param {*} event 
@@ -797,6 +925,46 @@ const Incidents = () => {
     })
     .catch(function(error){
       console.log(error)
+    })
+  }
+
+  /**
+   * close incident
+   * @param {*} item 
+   */
+  const handleClose = (item) => {
+    setIncident(item)
+    Swal.fire({
+      icon: 'question',
+      title: 'Close Incident ?',
+      confirmButtonText: 'Close Incident',
+      showCancelButton: true,
+      showLoaderOnConfirm: true,
+      preConfirm: () => {
+        Axs.patch(`api/incident/${item.id}/close`,{
+
+        })
+        .then(response => {
+          const socket = io(url)
+          socket.emit('closeIncident', response.data.datas)
+          Swal.showValidationMessage(
+            `Incident ${response.data.message}`
+          )
+        })
+        .catch(error => {
+          Swal.showValidationMessage(
+            `Request failed: ${error.message}`
+          )
+        })
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    })
+    .then(result => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Notifification'
+        })
+      }
     })
   }
 
@@ -1114,9 +1282,16 @@ const Incidents = () => {
         <CCol xs="12" lg="12">
           <CCard>
             <CCardHeader>
-              <CButton onClick={() => {createIncident()}} size="sm" color="primary">
-                New Incident
-              </CButton>
+              <CButtonGroup>
+                <CButton onClick={() => {createIncident()}} color="primary">
+                  New Incident
+                  <CIcon className="ml-2 mb-2" name="cil-plus"></CIcon>
+                </CButton>
+                <CButton onClick={() => {resfresh()}} color="info">
+                  Refresh 
+                  <CIcon className="ml-2 mb-2" name="cil-reload"></CIcon>
+                </CButton>
+              </CButtonGroup>
             </CCardHeader>
           </CCard>
           <CCard>
@@ -1145,12 +1320,12 @@ const Incidents = () => {
                 'category':
                 (item)=>(
                   <td>
-                    <Category category={item.categoryIncidents.name}/>
+                    <Category category={(item.categoryIncidents === null) ? "" : item.categoryIncidents.name}/>
                   </td>
                 ),
                 'team':
                 (item)=>(
-                  <td>{item.teamIncidents.name}</td>
+                  <td>{(item.teamIncidents === null) ? "" : item.teamIncidents.name}</td>
                 ),
                 'user':
                 (item)=>(
@@ -1177,14 +1352,15 @@ const Incidents = () => {
                   <td>
                     <CButtonGroup>
                       <CButton className="text-white" size="sm" onClick={() => {editIncident(item)}} color={getBadge('Pending')}>
-                        <CIcon name="cil-pencil" />
+                        <CIcon name="cil-pencil"/>
                       </CButton>
                       <ButtonDelete item={item} role={role} stage={item.stageIncidents.text} />
                       <CButton size="sm" onClick={() => {detailIncident(item)}} color={getBadge('Inactive')}>
-                        <CIcon name="cil-description" />
+                        <CIcon name="cil-description"/>
                       </CButton>
                       <ButtonCreateTicket item={item} role={role} stage={item.stageIncidents.text} />
                       <ButtonResolve item={item} role={role} stage={item.stageIncidents.text} />
+                      <ButtonClose  item={item} role={role} stage={item.stageIncidents.text} />
                     </CButtonGroup>
                   </td>
                 )

@@ -36,12 +36,14 @@ const TheHeaderDropdownMssg = (props) => {
 
   const readNotif = (data) => {
     Axios.patch(`api/notifications/${data.id}/read`,{})
-      .then(function(data){})
-        
-      Axios.get('api/notifications/incidents',{})
-      .then(function(response){
-        dispatch({type: 'set', notifications: response.data.data})
-      })
+    .then(function(data){
+      if(data.data.message === 'Success'){
+        Axios.get('api/notifications/incidents',{})
+        .then(function(response){
+          dispatch({type: 'set', notifications: response.data.data})
+        })
+      }
+    })    
   }
 
   return (

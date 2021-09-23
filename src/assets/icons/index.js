@@ -131,7 +131,10 @@ import {
   cilWarning,
   cilPaw,
   cilDescription,
-  cilAvTimer
+  cilAvTimer,
+  cilBook,
+  cilPlus,
+  cilReload,
 } from '@coreui/icons'
 
 export const icons = Object.assign({}, {
@@ -234,6 +237,9 @@ export const icons = Object.assign({}, {
   cilDescription,
   cilAvTimer,
   cilCheckAlt,
+  cilBook,
+  cilPlus,
+  cilReload,
 }, {
   cifUs,
   cifBr,

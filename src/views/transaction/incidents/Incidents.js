@@ -60,7 +60,8 @@ const fields = ['text','user','location', 'phone','stage', 'category', 'team', '
 const Incidents = () => {
   const [formData, setFormData] =  useReducer(formReducer, {})
   const [submitting, setSubmitting] = useState(false)
-  const [fileData, setFileData] = useState(null)
+  const [fileData, setFileData] = useState("")
+  const imageRef = useRef()
 
   const [status, setStatus] = useState(null)
   const [incidents, setIncidents] = useState([])
@@ -556,7 +557,7 @@ const Incidents = () => {
     setupData("incident","")
     setupData("location","")
     setupData("phone","")
-    setFileData();
+    setFileData("");
   }
   /**
    * melaporkan incident
@@ -582,6 +583,11 @@ const Incidents = () => {
       setModalAdd(false)
       setSuccessCreate(8)
       getIncidents()
+
+      setupData("incident","")
+      setupData("location","")
+      setupData("phone","")
+      imageRef.current.value = ""
     })
     .catch(function(error){
       console.log(error)
@@ -671,7 +677,7 @@ const Incidents = () => {
    */
   const createIncident = () => {
     setModalAdd(true)
-    setFileData(null)
+    setFileData("")
   }
 
   useEffect(() => { 
@@ -718,7 +724,6 @@ const Incidents = () => {
     }
   }
   
-
   /**
    * component buton input tincket
    * @param {*} props 
@@ -968,6 +973,14 @@ const Incidents = () => {
     })
   }
 
+  const reset = () => {
+    imageRef.current.value = ""
+    setupData("incident","")
+    setupData("location","")
+    setupData("phone","")
+    setFileData("")
+  }
+
   return (
     <>
       <CRow>
@@ -1049,7 +1062,7 @@ const Incidents = () => {
                 <CCol xs="12">
                   <CFormGroup>
                     <CLabel htmlFor="incident">Incident/Problem</CLabel>
-                    <CTextarea id="incident" name="incident" rows="5" onChange={handleChange} required></CTextarea>
+                    <CTextarea id="incident" name="incident" rows="5" onChange={handleChange} value={formData.incident || ""} required></CTextarea>
                   </CFormGroup>
                 </CCol>
               </CRow>
@@ -1057,13 +1070,13 @@ const Incidents = () => {
                 <CCol sx="6">
                   <CFormGroup>
                       <CLabel htmlFor="location">Location</CLabel>
-                      <CInput id="location" name="location" placeholder="Lokasi" step="1" onChange={handleChange} required />
+                      <CInput id="location" name="location" placeholder="Lokasi" step="1" onChange={handleChange} value={formData.location || ""} required />
                   </CFormGroup>
                 </CCol>
                 <CCol sx="6">
                   <CFormGroup>
                       <CLabel htmlFor="phone">Phone</CLabel>
-                      <CInput id="phone" name="phone" placeholder="Nomor Telephone" onChange={handleChange} required />
+                      <CInput id="phone" name="phone" placeholder="Nomor Telephone" onChange={handleChange} value={formData.phone || ""} required />
                   </CFormGroup>
                 </CCol>
               </CRow>
@@ -1085,17 +1098,21 @@ const Incidents = () => {
                 <CCol sx="6">
                   <CFormGroup>
                     <CLabel htmlFor="lampiran">File</CLabel>
-                    <CInputFile name="file" onChange={handleFile} multiple={true} />
+                    {/* <CInputFile name="file" onChange={handleFile} multiple={true} ref={imageRef} /> */}
+                    <input type="file" className="form-control" name="file" onChange={handleFile} multiple={true} ref={imageRef} />
                   </CFormGroup>
                 </CCol>
               </CRow>
             </CModalBody>
             <CModalFooter>
-              <CButton type="submit" color="primary">Save</CButton>
-              <CButton 
-                color="secondary" 
-                onClick={() => {setModalAdd(false)}}
-              >Cancel</CButton>
+              <CButtonGroup>
+                <CButton type="submit" color="primary">Save</CButton>
+                <CButton type="button" color="warning" className="text-white" onClick={()=>{reset()}}>Reset</CButton>
+                <CButton 
+                  color="secondary" 
+                  onClick={() => {setModalAdd(false)}}
+                >Cancel</CButton>
+              </CButtonGroup>
             </CModalFooter>
           </CForm>
         </CModal>

@@ -1,5 +1,6 @@
 import React from 'react';
 import Incidents from './views/transaction/incidents/Incidents';
+import Requests from './views/transaction/requests/Requests';
 
 const Toaster = React.lazy(() => import('./views/notifications/toaster/Toaster'));
 const Tables = React.lazy(() => import('./views/base/tables/Tables'));
@@ -43,6 +44,7 @@ const Roles = React.lazy(() => import('./views/master/roles/Roles'));
 const Stages = React.lazy(() => import('./views/master/stages/Stages'));
 const Categories = React.lazy(() => import('./views/master/categories/Categories'))
 const Users = React.lazy(() => import('./views/master/users/Users'))
+const Requesest = React.lazy(() => import('./views/transaction/requests/Requests'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
@@ -87,6 +89,7 @@ const routes = [
   // new
   
   { path: '/transaction/incidents', name: 'Incidents', component: Incidents},
+  { path: '/transaction/requests', name: 'Requests', component: Requests },
   { path: '/master/teams', name: 'Teams', component: Teams},
   { path: '/master/roles', name: 'Roles', component: Roles},
   { path: '/master/stages', name: 'Stages', component: Stages},

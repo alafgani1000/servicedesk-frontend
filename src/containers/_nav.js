@@ -25,7 +25,7 @@ import CIcon from '@coreui/icons-react'
       {
         _tag: 'CSidebarNavItem',
         name: 'Request',
-        to: '/theme/colors',
+        to: '/transaction/requests',
         icon: <CIcon name="cil-pencil" customClasses="c-sidebar-nav-icon"/>,
       },
       {

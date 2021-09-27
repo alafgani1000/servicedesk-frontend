@@ -29,6 +29,7 @@ import {
   CProgress,
   CTooltip,
   CCardSubtitle,
+  CHeader,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { DocsLink } from 'src/reusable'
@@ -69,6 +70,7 @@ const Requests = () => {
     const [modalEdit,setModalEdit] = useState(false)
     const [modalDelete,setModalDelete] = useState(false)
     const [modalOpen,setModalOpen] = useState(false)
+    const [modalResolve,setModalResolve] = useState(false)
     const [idAttachment,setIdAttachment] = useState(false)
     const [status,setStatus] = useState(null)
     const [requests,setRequests] = useState([])
@@ -315,12 +317,15 @@ const Requests = () => {
                     icon:"success",
                     title:"Request Approved"
                 })
+                // send socket data to server
+                const socket = io(url)
+                socket.emit("openRequest",update.data.notifId)
                 // show ticket
                 Swal.fire({
                     title:'Request Approved',
                     width: 600,
                     padding: '3m',
-                    html:'<b>NOMOR TICKET : '+update.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+update.data.start_date+' '+update.data.start_time+' </span> Sampai <span class="badge bg-warning text-white">'+update.data.end_date+ ' '+update.data.end_time+'</span></b> '
+                    html:'<b>NOMOR TICKET : '+update.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+update.data.data.start_date+' </span> Sampai <span class="badge bg-warning text-white">'+update.data.data.end_date+ '</span></b> '
                   })
             }else if(update.data.status === "error"){
                 setModalOpen(false)
@@ -568,6 +573,11 @@ const Requests = () => {
         setupData("elocation",requestData.location)
         setupData("ephone",requestData.phone)
     }
+
+    const confirmResolve = (item) => {
+        setRequest(item)
+        setModalResolve(true)
+    }
     
     /**
      * menampilkan gambar lamipran
@@ -775,11 +785,11 @@ const Requests = () => {
                 </CModalFooter>
             </CForm>
         </CModal>
-        {/* modal delete */}
+        {/* modal delete attachment */}
         <CModal
-        show={modalDelete}
-        onClose={setModalDelete}
-        size="sm"
+            show={modalDelete}
+            onClose={setModalDelete}
+            size="sm"
         >
             <CModalBody className="bg-secondary">
                <h5>Delete file ?</h5>
@@ -841,6 +851,29 @@ const Requests = () => {
                     </CButtonGroup>
                 </CModalFooter>
             </CForm>
+        </CModal>
+        {/* modal resolve request */}
+        <CModal
+            show={modalResolve}
+            onClose={setModalResolve}
+            size="sm"
+        >
+            <CModalHeader>
+                <CModalTitle>Confirm</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                <h5>Resolve Request ?</h5>
+            </CModalBody>
+            <CModalFooter>
+                <CButtonGroup>
+                    <CButton type="button" color="success">
+                        Resolve <CIcon className="mb-1 ml-2" name="cil-check-circle"></CIcon>
+                    </CButton>
+                    <CButton type="button" color="secondary" onClick={() => {setModalResolve(false)}}>
+                        Cancel <CIcon className="mb-1 ml-2" name="cil-x"></CIcon>
+                    </CButton>
+                </CButtonGroup>
+            </CModalFooter>
         </CModal>
         <CRow>
             {/* data table */}
@@ -910,6 +943,11 @@ const Requests = () => {
                             <CTooltip content="Open" placement="top-end">
                                 <CButton size="sm" color="primary" onClick={() => {showOpenRequest(item)}}>
                                     <CIcon name="cil-av-timer"></CIcon>
+                                </CButton>
+                            </CTooltip>
+                            <CTooltip content="Resolve" placement="top-end">
+                                <CButton size="sm" color="success" onClick={() => {confirmResolve(item)}}>
+                                    <CIcon name="cil-check-circle"></CIcon>
                                 </CButton>
                             </CTooltip>
                         </CButtonGroup>

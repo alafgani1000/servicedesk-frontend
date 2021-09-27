@@ -297,14 +297,14 @@ const Requests = () => {
             event.preventDefault()
             const sDate = moment(formData.startDate).format("YYYY-MM-DD")
             const sTime = moment(formData.startDate).format("HH:mm:ss")
-            const eDate = moment(formData.endDate).format("YYYY-MM-DDd")
+            const eDate = moment(formData.endDate).format("YYYY-MM-DD")
             const eTime = moment(formData.endDate).format("HH:mm:ss")
             // update
-            const update = Asios.patch(`api/request/${request.id}/open`,{
-                startDate:sDate,
-                startTime:sTime,
-                endDate:eDate,
-                endTime:eTime
+            const update = await Asios.patch(`api/request/${request.id}/open`,{
+                start_date:sDate,
+                start_time:sTime,
+                end_date:eDate,
+                end_time:eTime
             });
             // check status update data
             if(update.data.status === "success"){
@@ -320,7 +320,7 @@ const Requests = () => {
                     title:'Request Approved',
                     width: 600,
                     padding: '3m',
-                    html:'<b>NOMOR TICKET : '+update.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+response.data.start_date+' '+response.data.start_time+' </span> Sampai <span class="badge bg-warning text-white">'+response.data.end_date+ ' '+response.data.data.end_time+'</span></b> '
+                    html:'<b>NOMOR TICKET : '+update.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+update.data.start_date+' '+update.data.start_time+' </span> Sampai <span class="badge bg-warning text-white">'+update.data.end_date+ ' '+update.data.end_time+'</span></b> '
                   })
             }else if(update.data.status === "error"){
                 setModalOpen(false)
@@ -879,6 +879,14 @@ const Requests = () => {
                     'createdAt':
                     (item)=>(
                         <td>{moment(item.createdAt).format("DD-MM-YYYY H:m:s")}</td>
+                    ),
+                    'startDate':
+                    (item)=>(
+                        <td>{moment(item.start_date).format("DD-MM-YYYY H:m:s")}</td>
+                    ),
+                    'endDate':
+                    (item)=>(
+                        <td>{moment(item.end_date).format("DD-MM-YYYY H:m:s")}</td>
                     ),
                     'actions':
                     (item)=>(

@@ -9,7 +9,7 @@ const dataNotifIncident = () => {
     baseURL:'http://localhost:4001'
   });
 
-  Axios.get('api/notifications/incidents',{
+  Axios.get('api/notifications',{
 
   })
   .then(function(response){
@@ -31,6 +31,7 @@ const initialState = {
   notifIncident: dataNotifIncident,
   incidentSearch:"",
   notifications:[],
+  linkDashboard:"",
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {

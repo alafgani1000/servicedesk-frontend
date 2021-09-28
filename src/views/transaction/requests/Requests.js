@@ -40,7 +40,6 @@ import moment from 'moment'
 import Swal from 'sweetalert2'
 import io from 'socket.io-client'
 
-
 const getBadge = stage => {
   switch (stage) {
     case 'Active': return 'success'
@@ -58,7 +57,7 @@ const formReducer = (state, event) => {
   }
  }
 
-const fields = ['title','business_need','business_value', 'phone','location', 'startDate','endDate','createdAt', 'actions']
+const fields = ['title','business_need','business_value', 'stage', 'phone','location', 'startDate','endDate','createdAt', 'actions']
 
 const Requests = () => {
     const [formData,setFormData] =  useReducer(formReducer, {})
@@ -71,6 +70,8 @@ const Requests = () => {
     const [modalDelete,setModalDelete] = useState(false)
     const [modalOpen,setModalOpen] = useState(false)
     const [modalResolve,setModalResolve] = useState(false)
+    const [modalArchive,setModalArchive] = useState(false)
+    const [modalClose,setModalClose] = useState(false)
     const [idAttachment,setIdAttachment] = useState(false)
     const [status,setStatus] = useState(null)
     const [requests,setRequests] = useState([])
@@ -459,6 +460,18 @@ const Requests = () => {
     const DetailRequest = () => {
         {/* modal detail */}
         if(request !== undefined){
+            let color = ''
+            if(request.stagesRequests.text === 'New'){
+                color = 'info'
+            }else if(request.stagesRequests.text === 'Open'){
+                color = 'warning'
+            }else if(request.stagesRequests.text === 'Resolve'){
+                color = 'primary'
+            }else if(request.stagesRequests.text === 'Close'){
+                color = 'success'
+            }else if(request.stagesRequests.text === 'Archive'){
+                color = 'secondary'
+            }
             return(    
                 <CCard>
                     <CCardHeader>
@@ -488,6 +501,14 @@ const Requests = () => {
                                 <CFormGroup>
                                     <CLabel className="font-weight-bold">Business Value:</CLabel>
                                     <CCardText>{request.business_value || ""}</CCardText>
+                                </CFormGroup>
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol>
+                                <CFormGroup>
+                                    <CLabel className="font-weight-bold">Stage:</CLabel>
+                                    <CCardText><CBadge color={color} style={{fontSize:"12px"}}>{request.stagesRequests.text}</CBadge></CCardText>
                                 </CFormGroup>
                             </CCol>
                         </CRow>
@@ -574,13 +595,85 @@ const Requests = () => {
         setupData("ephone",requestData.phone)
     }
 
+    /**
+     * show form confirmation resolve
+     * @param {*} item 
+     */
     const confirmResolve = (item) => {
         setRequest(item)
         setModalResolve(true)
     }
+
+    /**
+     * process resolve
+     * @param {*} data 
+     */
+    const requestResolve = async (data) => {
+        try {
+            const resolve = await Asios.patch(`api/request/${data.id}/resolve`, {})
+            if (resolve.data.status === "success") {
+                // show toast
+                Toast.fire({
+                    icon:"success",
+                    title:"Resolve Successfully"
+                })
+                // send web socket data for notification
+                const socket = io(url)
+                socket.emit("resolveRequest", resolve.data.notifId)
+                // close modal
+                setModalResolve(false)
+            } else if (resolve.data.status === "error"){
+                Toast.fire({
+                    icon:"error",
+                    title:"Resolve Fail"
+                })
+            }   
+        } catch (error) {
+            Toast.fire({
+                icon:"error",
+                title:"Resolve Fail"
+            })
+        }
+    }
+
+    const confirmClose =  (item) => {
+        setRequest(item)
+        setModalClose(true)
+    }
+
+    const requestClose = async (data) => {
+        try {
+            const close = await Asios.patch(`api/request/${data.id}/close`, {})
+            if (close.data.status ==="success") {
+                // show toast
+
+                Toast.fire({
+                    icon:"success",
+                    title:"Close Successfully"
+                })
+
+                // send web socket data for notification
+                const socket = io(url)
+                socket.emit("closeRequest", close.data.notifId)
+                
+                // close modal
+                setModalClose(false)
+            } else if (close.data.status === "success") {
+                Toast.fire({
+                    icon:"error",
+                    title:"Close Fail"
+                })
+            }
+        } catch (error) {
+            Toast.fire({
+                icon:"error",
+                title:"Close Fail"
+            })
+        }
+    }
     
     /**
-     * menampilkan gambar lamipran
+     * menampilkan gambar lampiran
      * @param {*} item 
      */
     const showImage = (item) => {
@@ -607,6 +700,79 @@ const Requests = () => {
         getRequest()
     },[])
 
+    const ButtonOpen = (props) => {
+        if (props.role === "admin") {
+            if (props.stage === "New") {
+                return (
+                    <CTooltip content="Open" placement="top-end">
+                        <CButton size="sm" color="primary" onClick={() => {showOpenRequest(props.item)}}>
+                            <CIcon name="cil-av-timer"></CIcon>
+                        </CButton>
+                    </CTooltip>
+                )
+            } else {
+                return ""
+            }
+        } else {
+            return ""
+        }
+    }
+
+    const ButtonResolve = (props) => {
+        if (props.role === "admin") {
+            if (props.stage === "Open") {
+                return (
+                    <CTooltip content="Resolve" placement="top-end">
+                        <CButton size="sm" color="success" onClick={() => {confirmResolve(props.item)}}>
+                            <CIcon name="cil-check-circle"></CIcon>
+                        </CButton>
+                    </CTooltip>
+                )
+            } else {
+                return ""
+            }
+        } else {
+            return ""
+        }
+    }
+
+    const ButtonClose = (props) => {
+        if (props.role === "admin") {
+            if(props.stage === "Resolve") {
+                return (
+                    <CTooltip content="Close" placement="top-end">
+                        <CButton size="sm" color="info" onClick={() => {confirmClose(props.item)}}>
+                            <CIcon name="cil-book"></CIcon>
+                        </CButton>
+                    </CTooltip>
+                )
+            } else {
+                return ""
+            }
+        } else {
+            return ""
+        }
+    }
+
+    const Stage = (props) => {
+        let color = "info"
+        if(props.stage === "New"){
+          color = "info"
+        }else if(props.stage === "Open"){
+          color = "warning"
+        }else if(props.stage === "Resolve"){
+          color = "primary"
+        }else if(props.stage === "Close"){
+          color = "success"
+        }else if(props.stage === "Archive"){
+          color = "seccondary"
+        }
+        return (
+          <CBadge color={color}>{props.stage}</CBadge>
+        )
+      }
+    
+    
     return (
         <>
         {/* modal create */}
@@ -866,10 +1032,33 @@ const Requests = () => {
             </CModalBody>
             <CModalFooter>
                 <CButtonGroup>
-                    <CButton type="button" color="success">
+                    <CButton type="button" color="success" onClick={() => {requestResolve(request)}}>
                         Resolve <CIcon className="mb-1 ml-2" name="cil-check-circle"></CIcon>
                     </CButton>
                     <CButton type="button" color="secondary" onClick={() => {setModalResolve(false)}}>
+                        Cancel <CIcon className="mb-1 ml-2" name="cil-x"></CIcon>
+                    </CButton>
+                </CButtonGroup>
+            </CModalFooter>
+        </CModal>
+        {/* moda close request */}
+        <CModal
+            show={modalClose}
+            onClose={setModalClose}
+            size="sm"
+        >
+            <CModalHeader>
+                <CModalTitle>Confirm</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                <h5>Close Request ?</h5>
+            </CModalBody>
+            <CModalFooter>
+                <CButtonGroup>
+                    <CButton type="button" color="info" onClick={() => {requestClose(request)}}>
+                        Close <CIcon className="mb-1 ml-2" name="cil-book"></CIcon>
+                    </CButton>
+                    <CButton type="button" color="secondary" onClick={() => {setModalClose(false)}}>
                         Cancel <CIcon className="mb-1 ml-2" name="cil-x"></CIcon>
                     </CButton>
                 </CButtonGroup>
@@ -909,6 +1098,10 @@ const Requests = () => {
                 sorter
                 itemsPerPageSelect
                 scopedSlots = {{
+                    'stage':
+                    (item)=>(
+                        <td><Stage stage={item.stagesRequests.text} /></td>
+                    ),
                     'createdAt':
                     (item)=>(
                         <td>{moment(item.createdAt).format("DD-MM-YYYY H:m:s")}</td>
@@ -930,26 +1123,14 @@ const Requests = () => {
                                     <CIcon name="cil-pencil"></CIcon>
                                 </CButton>
                             </CTooltip>
-                            <CTooltip content="Delete" placement="top-end">
-                                <CButton size="sm" color="danger">
-                                    <CIcon name="cil-trash"></CIcon>
-                                </CButton>
-                            </CTooltip>
                             <CTooltip content="Detail" placement="top-end">
                                 <CButton size="sm" color="secondary" onClick={() => {showDetail(item)}}>
                                     <CIcon name="cil-description"></CIcon>
                                 </CButton>
                             </CTooltip>
-                            <CTooltip content="Open" placement="top-end">
-                                <CButton size="sm" color="primary" onClick={() => {showOpenRequest(item)}}>
-                                    <CIcon name="cil-av-timer"></CIcon>
-                                </CButton>
-                            </CTooltip>
-                            <CTooltip content="Resolve" placement="top-end">
-                                <CButton size="sm" color="success" onClick={() => {confirmResolve(item)}}>
-                                    <CIcon name="cil-check-circle"></CIcon>
-                                </CButton>
-                            </CTooltip>
+                            <ButtonOpen stage={item.stagesRequests.text} role={role} item={item} />
+                            <ButtonResolve stage={item.stagesRequests.text} role={role} item={item} />
+                            <ButtonClose stage={item.stagesRequests.text} role={role} item={item} />
                         </CButtonGroup>
                     </td>
                     )

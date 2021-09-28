@@ -27,6 +27,7 @@ import {
   CLink,
   CAlert,
   CProgress,
+  CTooltip,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { DocsLink } from 'src/reusable'
@@ -712,9 +713,11 @@ const Incidents = () => {
     if(props.role === 'guest'){
       if(props.stage === 'New'){
         return (
-          <CButton size="sm" onClick={() => {deleteConfirmation(props.item)}} color={getBadge('Banned')}>
-            <CIcon name="cil-trash" />
-          </CButton>
+          <CTooltip content="Delete" placement="top-end">
+            <CButton size="sm" onClick={() => {deleteConfirmation(props.item)}} color={getBadge('Banned')}>
+              <CIcon name="cil-trash" />
+            </CButton>
+          </CTooltip>
         )
       }else{
         return ""
@@ -733,9 +736,11 @@ const Incidents = () => {
     if(props.role === "admin"){
       if(props.stage === "New"){
         return (
-          <CButton size="sm" onClick={() => {showModalCreateTicket(props.item)}} color="primary">
-            <CIcon name="cil-av-timer" />
-          </CButton>
+          <CTooltip content="Create ticket" placement="top-end">
+            <CButton size="sm" onClick={() => {showModalCreateTicket(props.item)}} color="primary">
+              <CIcon name="cil-av-timer" />
+            </CButton>
+          </CTooltip>
         )
       }else{
         return ""
@@ -754,9 +759,11 @@ const Incidents = () => {
     if(props.role === "technician"){
       if(props.stage === "Open"){
         return (
-          <CButton size="sm" color="success" onClick={() => {showModalResolve(props.item)}}>
-            <CIcon name="cil-check-circle"/>
-          </CButton>
+          <CTooltip content="Resolve" placement="top-end">
+            <CButton size="sm" color="success" onClick={() => {showModalResolve(props.item)}}>
+              <CIcon name="cil-check-circle"/>
+            </CButton>
+          </CTooltip>
         )
       }else{
         return ""
@@ -824,9 +831,11 @@ const Incidents = () => {
     if(props.role === "admin"){
       if(props.stage === "Resolve"){
         return (
-          <CButton size="sm" color="danger" onClick={() => {handleClose(props.item)}}>
-            <CIcon name="cil-book"/>
-          </CButton>
+          <CTooltip content="Close" placement="top-end">
+            <CButton size="sm" color="danger" onClick={() => {handleClose(props.item)}}>
+              <CIcon name="cil-book"/>
+            </CButton>
+          </CTooltip>
         )   
       }else{
         return ""
@@ -1368,13 +1377,17 @@ const Incidents = () => {
                 (item)=>(
                   <td>
                     <CButtonGroup>
-                      <CButton className="text-white" size="sm" onClick={() => {editIncident(item)}} color={getBadge('Pending')}>
-                        <CIcon name="cil-pencil"/>
-                      </CButton>
+                      <CTooltip content="Edit" placement="top-end">
+                        <CButton className="text-white" size="sm" onClick={() => {editIncident(item)}} color={getBadge('Pending')}>
+                          <CIcon name="cil-pencil"/>
+                        </CButton>
+                      </CTooltip>
                       <ButtonDelete item={item} role={role} stage={item.stageIncidents.text} />
-                      <CButton size="sm" onClick={() => {detailIncident(item)}} color={getBadge('Inactive')}>
-                        <CIcon name="cil-description"/>
-                      </CButton>
+                      <CTooltip content="Detail" placement="top-end">
+                        <CButton size="sm" onClick={() => {detailIncident(item)}} color={getBadge('Inactive')}>
+                          <CIcon name="cil-description"/>
+                        </CButton>
+                      </CTooltip>
                       <ButtonCreateTicket item={item} role={role} stage={item.stageIncidents.text} />
                       <ButtonResolve item={item} role={role} stage={item.stageIncidents.text} />
                       <ButtonClose  item={item} role={role} stage={item.stageIncidents.text} />

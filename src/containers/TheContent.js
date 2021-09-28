@@ -8,7 +8,8 @@ import { CContainer, CFade } from '@coreui/react'
 
 // routes config
 import routes from '../routes'
-  
+import { useSelector } from 'react-redux'
+
 const loading = (
   <div className="pt-3 text-center">
     <div className="sk-spinner sk-spinner-pulse"></div>
@@ -16,6 +17,7 @@ const loading = (
 )
 
 const TheContent = () => {
+  const linkDashboard = useSelector(state => state.linkDashboard)
   return (
     <main className="c-main">
       <CContainer fluid>
@@ -35,7 +37,8 @@ const TheContent = () => {
                   )} />
               )
             })}
-            <Redirect from="/" to="/dashboard" />
+            {/* <Redirect from="/" to="/dashboard" /> */}
+            <Redirect from="/" to={linkDashboard} />
           </Switch>
         </Suspense>
       </CContainer>

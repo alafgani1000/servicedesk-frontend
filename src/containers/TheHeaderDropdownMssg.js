@@ -14,7 +14,7 @@ import axios from 'axios'
 
 const TheHeaderDropdownMssg = (props) => {
   const dispatch = useDispatch();
-  const [dataNotif, setDataNotif] = useState({})
+  const linkDashboard = useSelector(state => state.linkDashboard)
   const url =  useSelector(state => state.baseUrl)
 
   const history = useHistory()
@@ -38,7 +38,7 @@ const TheHeaderDropdownMssg = (props) => {
     Axios.patch(`api/notifications/${data.id}/read`,{})
     .then(function(data){
       if(data.data.message === 'Success'){
-        Axios.get('api/notifications/incidents',{})
+        Axios.get('api/notifications',{})
         .then(function(response){
           dispatch({type: 'set', notifications: response.data.data})
         })

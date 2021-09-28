@@ -51,9 +51,19 @@ const TheHeader = () => {
   });
 
   useEffect(() => {    
-    Axios.get('api/notifications/incidents',{
-  
+    Axios.post('api/auth/checkSign',{})
+    .then((response) => {
+      if (response.data.status === 'ok') {
+        dispatch({type: 'set', linkDashboard:'/dashboard'})
+      } else if(response.data.status === 'error') {
+        dispatch({type: 'set', linkDashboard:'/login'})
+      }
     })
+    .catch((error) => {
+      dispatch({type: 'set', linkDashboard:'/login'})
+    })
+
+    Axios.get('api/notifications',{})
     .then(function(response){
       dispatch({type: 'set', notifications: response.data.data})
     })

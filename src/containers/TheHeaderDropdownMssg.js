@@ -30,7 +30,11 @@ const TheHeaderDropdownMssg = (props) => {
   const setIncidentSearch = (data) => {
     const dataJson = JSON.parse(data.data)
     dispatch({type: 'set', incidentSearch: dataJson.text})
-    history.push('/transaction/incidents')
+    if(data.tableName === 'requests'){
+      history.push('/transaction/requests')
+    }else if(data.tableName === 'incidents'){
+      history.push('/transaction/incidents')
+    }
     readNotif(data)
   }
 

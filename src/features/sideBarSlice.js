@@ -32,6 +32,7 @@ const initialState = {
   incidentSearch:"",
   notifications:[],
   linkDashboard:"",
+  notification:{},
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {

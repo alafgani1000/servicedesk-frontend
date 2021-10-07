@@ -483,7 +483,7 @@ const Requests = () => {
                                                         <td>
                                                             <div className="c-avatar" style={{marginBottom:15}}>
                                                                <div style={{borderRadius:'50%', backgroundColor:'silver', paddingLeft:10, paddingRight:10}}>
-                                                                    <span style={{fontSize:28, fontWeight:'bold'}}>A</span>
+                                                                    <span style={{fontSize:28, fontWeight:'bold'}}>{item.userDev.name.charAt(0).toUpperCase()}</span>
                                                                 </div>
                                                             </div>
                                                         </td>

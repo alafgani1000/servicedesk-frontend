@@ -797,7 +797,6 @@ const Requests = () => {
                 })
             } else {
                 const checked = checkSelDeveloper(devSelect, value);
-                console.log(checked+"=="+value)
                 if (checked !== value) {
                     setDevSelect(prevState => {
                         return [ ...prevState, {"name":text, "value":value}]

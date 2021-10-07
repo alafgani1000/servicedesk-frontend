@@ -30,6 +30,7 @@ import {
   CTooltip,
   CCardSubtitle,
   CHeader,
+  CImg,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { DocsLink } from 'src/reusable'
@@ -76,6 +77,8 @@ const Requests = () => {
     const [status,setStatus] = useState(null)
     const [requests,setRequests] = useState([])
     const [request,setRequest] = useState()
+    const [developers,setDevelopers] = useState([])
+    const [devSelect,setDevSelect] = useState([])
     const url = useSelector(state => state.baseUrl)
     const role = useSelector(state => state.role)
     const incidentSearch = useSelector(state => state.incidentSearch)
@@ -302,37 +305,44 @@ const Requests = () => {
             const sTime = moment(formData.startDate).format("HH:mm:ss")
             const eDate = moment(formData.endDate).format("YYYY-MM-DD")
             const eTime = moment(formData.endDate).format("HH:mm:ss")
-            // update
-            const update = await Asios.patch(`api/request/${request.id}/open`,{
-                start_date:sDate,
-                start_time:sTime,
-                end_date:eDate,
-                end_time:eTime
-            });
-            // check status update data
-            if(update.data.status === "success"){
-                setModalOpen(false)
-                getRequests()
-                // show toast
-                Toast.fire({
-                    icon:"success",
-                    title:"Request Approved"
-                })
-                // send socket data to server
-                const socket = io(url)
-                socket.emit("openRequest",update.data.notifId)
-                // show ticket
+            if (devSelect.length > 0) {
+                // update
+                const update = await Asios.patch(`api/request/${request.id}/open`,{
+                    start_date:sDate,
+                    start_time:sTime,
+                    end_date:eDate,
+                    end_time:eTime,
+                    developers:devSelect
+                });
+                // check status update data
+                if(update.data.status === "success"){
+                    setModalOpen(false)
+                    getRequests()
+                    // show toast
+                    Toast.fire({
+                        icon:"success",
+                        title:"Request Approved"
+                    })
+                    // send socket data to server
+                    const socket = io(url)
+                    socket.emit("openRequest",update.data.notifId)
+                    // show ticket
+                    Swal.fire({
+                        title:'Request Approved',
+                        width: 600,
+                        padding: '3m',
+                        html:'<b>NOMOR TICKET : '+update.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+update.data.data.start_date+' </span> Sampai <span class="badge bg-warning text-white">'+update.data.data.end_date+ '</span></b> '
+                    })
+                }else if(update.data.status === "error"){
+                    setModalOpen(false)
+                    Toast.fire({
+                        icon:"error",
+                        title:"Process Fail"
+                    })
+                }
+            } else {
                 Swal.fire({
-                    title:'Request Approved',
-                    width: 600,
-                    padding: '3m',
-                    html:'<b>NOMOR TICKET : '+update.data.ticket+'</b><br><b>Dari <span class="badge bg-warning text-white">'+update.data.data.start_date+' </span> Sampai <span class="badge bg-warning text-white">'+update.data.data.end_date+ '</span></b> '
-                  })
-            }else if(update.data.status === "error"){
-                setModalOpen(false)
-                Toast.fire({
-                    icon:"error",
-                    title:"Process Fail"
+                    title:'Please chose developer'
                 })
             }
         } catch(error) {
@@ -346,6 +356,7 @@ const Requests = () => {
     const showOpenRequest = (item) => {
         setRequest(item)
         setModalOpen(true)
+        setDevSelect([])
     }
 
     /**
@@ -453,6 +464,51 @@ const Requests = () => {
         }
     }
 
+    const RequestDevelopers = () => {
+        if (request !== undefined) {
+            return(
+                <CCard>
+                    <CCardHeader>
+                        <CCardSubtitle>Developers</CCardSubtitle>
+                    </CCardHeader>
+                    <CCardBody>
+                        <CRow>
+                            <CCol>
+                                <table>
+                                    <tbody>
+                                        {
+                                            request.requestDevelopers.map((item,index) => {
+                                                return( 
+                                                    <tr key={index}>
+                                                        <td>
+                                                            <div className="c-avatar" style={{marginBottom:15}}>
+                                                               <div style={{borderRadius:'50%', backgroundColor:'silver', paddingLeft:10, paddingRight:10}}>
+                                                                    <span style={{fontSize:28, fontWeight:'bold'}}>A</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td style={{verticalAlign:'top'}}>
+                                                            <span style={{fontSize:20, fontWeight:"bold", marginLeft:10 }}>{ item.userDev.name.charAt(0).toUpperCase() + item.userDev.name.slice(1) }</span>
+                                                        </td>
+                                                    </tr>)
+                                                })
+                                        }
+                                    </tbody>
+                                </table>
+                            </CCol>
+                        </CRow>
+                    </CCardBody>
+                </CCard>
+            )
+        } else {
+            return (
+                <CRow>
+                    Data Not Found
+                </CRow>
+            )
+        }
+    }
+
     /**
      * detail request component
      * @returns 
@@ -509,6 +565,24 @@ const Requests = () => {
                                 <CFormGroup>
                                     <CLabel className="font-weight-bold">Stage:</CLabel>
                                     <CCardText><CBadge color={color} style={{fontSize:"12px"}}>{request.stagesRequests.text}</CBadge></CCardText>
+                                </CFormGroup>
+                            </CCol>
+                            <CCol>
+                                <CFormGroup>
+                                    <CLabel className="font-weight-bold">Nomor Ticket:</CLabel>
+                                    <CCardText><CBadge color={color} style={{fontSize:"12px"}}>{request.ticket}</CBadge></CCardText>
+                                </CFormGroup>
+                            </CCol>
+                            <CCol>
+                                <CFormGroup>
+                                    <CLabel className="font-weight-bold">Start Date:</CLabel>
+                                    <CCardText><CBadge color={color} style={{fontSize:"12px"}}>{moment(request.start_date).format("DD MMMM YY")}</CBadge></CCardText>
+                                </CFormGroup>
+                            </CCol>
+                            <CCol>
+                                <CFormGroup>
+                                    <CLabel className="font-weight-bold">End Date:</CLabel>
+                                    <CCardText><CBadge color={color} style={{fontSize:"12px"}}>{moment(request.end_date).format("DD MMMM YY")}</CBadge></CCardText>
                                 </CFormGroup>
                             </CCol>
                         </CRow>
@@ -636,11 +710,19 @@ const Requests = () => {
         }
     }
 
+    /**
+     * show close confirmation
+     * @param {*} item 
+     */
     const confirmClose =  (item) => {
         setRequest(item)
         setModalClose(true)
     }
 
+    /**
+     * proses close request
+     * @param {*} data 
+     */
     const requestClose = async (data) => {
         try {
             const close = await Asios.patch(`api/request/${data.id}/close`, {})
@@ -686,6 +768,55 @@ const Requests = () => {
         })
     }
 
+    /**
+     * check array
+     * @param {*} dataArray 
+     * @param {*} dataValue 
+     */
+    const checkSelDeveloper = (dataArray, dataValue) => {
+        for(var i = 0; i < dataArray.length; i++) {
+            if (dataArray[i].value === dataValue) {
+                return dataValue;
+            }
+        }
+    }
+
+    /**
+     * handle chose developers
+     * @param {*} event 
+     */
+    const handleSelDeveloper = event => {
+        const target = event.target
+        const name = target.name
+        const value = target.value
+        const text = event.target.options[event.target.selectedIndex].text
+        if(value !== 0) {
+            if (devSelect.length === 0) {
+                setDevSelect(prevState => {
+                    return [ ...prevState, {"name":text, "value":value}]
+                })
+            } else {
+                const checked = checkSelDeveloper(devSelect, value);
+                console.log(checked+"=="+value)
+                if (checked !== value) {
+                    setDevSelect(prevState => {
+                        return [ ...prevState, {"name":text, "value":value}]
+                    })
+                }
+            }
+        }
+    }
+
+    /**
+     * remove developers
+     * @param {*} id 
+     */
+    const removeSelDeveloper = (id) => {
+        let dataSelect = devSelect
+        let filteredData = dataSelect.filter(value => value.value !== id)
+        setDevSelect(filteredData)
+    }
+
     useEffect(() => { 
         // setStateIncidentSearch(incidentSearch)
         const getRequest = () => {
@@ -697,9 +828,24 @@ const Requests = () => {
                 history.push('/login')
             })
         }
+        const getDevelopers = () => {
+            Axs.get('api/user/data/developers',{})
+            .then((response) => {
+                setDevelopers(response.data.data)
+            })
+            .catch((error) => {
+                history.push('/login')
+            })
+        }
         getRequest()
+        getDevelopers()
     },[])
 
+    /**
+     * component button open
+     * @param {*} props 
+     * @returns 
+     */
     const ButtonOpen = (props) => {
         if (props.role === "admin") {
             if (props.stage === "New") {
@@ -718,6 +864,11 @@ const Requests = () => {
         }
     }
 
+    /**
+     * component button resolve
+     * @param {*} props 
+     * @returns 
+     */
     const ButtonResolve = (props) => {
         if (props.role === "admin") {
             if (props.stage === "Open") {
@@ -736,6 +887,11 @@ const Requests = () => {
         }
     }
 
+    /**
+     * component button close
+     * @param {*} props 
+     * @returns 
+     */
     const ButtonClose = (props) => {
         if (props.role === "admin") {
             if(props.stage === "Resolve") {
@@ -754,6 +910,11 @@ const Requests = () => {
         }
     }
 
+    /**
+     * component stage
+     * @param {*} props 
+     * @returns 
+     */
     const Stage = (props) => {
         let color = "info"
         if(props.stage === "New"){
@@ -770,7 +931,7 @@ const Requests = () => {
         return (
           <CBadge color={color}>{props.stage}</CBadge>
         )
-      }
+    }
     
     
     return (
@@ -863,6 +1024,7 @@ const Requests = () => {
             </CModalHeader>
             <CModalBody>
                 <DetailRequest/>
+                <RequestDevelopers/>
                 <AttachmentRequest/>
             </CModalBody>
             <CModalFooter>
@@ -993,7 +1155,7 @@ const Requests = () => {
                         <CCol>
                             <CFormGroup>
                                 <CLabel>Start Date:</CLabel>
-                                <CInput type="datetime-local" name="startDate" onChange={handleChange}></CInput>
+                                <CInput type="datetime-local" name="startDate" onChange={handleChange} required></CInput>
                             </CFormGroup>
                         </CCol>
                     </CRow>
@@ -1001,7 +1163,48 @@ const Requests = () => {
                         <CCol>
                             <CFormGroup>
                                 <CLabel>End Date:</CLabel>
-                                <CInput type="datetime-local" name="endDate" onChange={handleChange}></CInput>
+                                <CInput type="datetime-local" name="endDate" onChange={handleChange} required></CInput>
+                            </CFormGroup>
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol>
+                            <CFormGroup>
+                                <CLabel>Developer</CLabel>
+                                <select name="developer" className="form-control" onChange={handleSelDeveloper}>
+                                        <option value="0">Chose...</option>
+                                    {
+                                        developers.map((value,index) => {
+                                            return <option valuetext={value.name} key={index} value={value.id}>{value.name}</option>
+                                        })
+                                    }
+                                </select>
+                            </CFormGroup>
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol>
+                            <CFormGroup>
+                                <CLabel>Developer choosed:</CLabel>
+                                <table className="table">
+                                    <tbody>
+                                        {
+                                            devSelect.map((value,index) => {
+                                                return( 
+                                                    <tr key={index}>
+                                                        <td><CIcon name="cil-check-alt"></CIcon></td>
+                                                        <td>{value.name}</td>
+                                                        <td>
+                                                            <CTooltip content="remove" placement="top-end">
+                                                                <CButton className="btn btn-sm btn-danger" onClick={() => {removeSelDeveloper(value.value)}}><CIcon name="cil-x"></CIcon></CButton>
+                                                            </CTooltip>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                        }
+                                    </tbody>
+                                </table>
                             </CFormGroup>
                         </CCol>
                     </CRow>

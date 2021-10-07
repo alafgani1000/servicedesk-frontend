@@ -71,6 +71,7 @@ const Requests = () => {
     const [modalDelete,setModalDelete] = useState(false)
     const [modalOpen,setModalOpen] = useState(false)
     const [modalResolve,setModalResolve] = useState(false)
+    const [modalDelDeveloper,setModalDelDeveloper] = useState(false)
     const [modalArchive,setModalArchive] = useState(false)
     const [modalClose,setModalClose] = useState(false)
     const [idAttachment,setIdAttachment] = useState(false)
@@ -79,6 +80,7 @@ const Requests = () => {
     const [request,setRequest] = useState()
     const [developers,setDevelopers] = useState([])
     const [devSelect,setDevSelect] = useState([])
+    const [developer,setDeveloper] = useState({})
     const url = useSelector(state => state.baseUrl)
     const role = useSelector(state => state.role)
     const incidentSearch = useSelector(state => state.incidentSearch)
@@ -116,12 +118,24 @@ const Requests = () => {
         
         })
         .then(function(response){
-        // handle success
-        setStatus(response.data.status)
-        setRequests(response.data.data)
+            // handle success
+            setStatus(response.data.status)
+            setRequests(response.data.data)
         })
         .catch(function(error){
-        history.push('/login')
+            history.push('/login')
+        })
+    }
+
+    const getRequest = (id) => {
+        Axs.get(`api/request/${id}`,{
+
+        })
+        .then((response) => {
+            setRequest(response.data.data)
+        })
+        .catch((error) => {
+            history.push('/login')
         })
     }
 
@@ -142,7 +156,7 @@ const Requests = () => {
             name: event.target.name,
             value: isCheckbox ? event.target.checked : event.target.value,
         })
-      }
+    }
 
     /**
     * menyimaan inputan di formData
@@ -164,6 +178,9 @@ const Requests = () => {
         setFileData(event.target.files)
     }
 
+    /**
+     * toast confirmation
+     */
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -353,6 +370,10 @@ const Requests = () => {
         }
     }
 
+    /**
+     * show from request open stage
+     * @param {*} item 
+     */
     const showOpenRequest = (item) => {
         setRequest(item)
         setModalOpen(true)
@@ -464,6 +485,10 @@ const Requests = () => {
         }
     }
 
+    /**
+     * component detail request developers
+     * @returns 
+     */
     const RequestDevelopers = () => {
         if (request !== undefined) {
             return(
@@ -507,6 +532,85 @@ const Requests = () => {
                 </CRow>
             )
         }
+    }
+
+    /**
+     * component update request developers
+     * @returns 
+     */
+    const UpdateRequestDevelopers = () => {
+        if (request !== undefined) {
+            return(
+                <CCard>
+                    <CCardHeader>
+                        <CCardSubtitle>Developers</CCardSubtitle>
+                    </CCardHeader>
+                    <CCardBody>
+                        <CRow>
+                            <CCol>
+                                <table className="table table-responsive">
+                                    <tbody>
+                                        {
+                                            request.requestDevelopers.map((item,index) => {
+                                                return( 
+                                                    <tr key={index}>
+                                                        <td>
+                                                            <div className="c-avatar" style={{marginBottom:15}}>
+                                                               <div style={{borderRadius:'50%', backgroundColor:'silver', paddingLeft:10, paddingRight:10}}>
+                                                                    <span style={{fontSize:28, fontWeight:'bold'}}>{item.userDev.name.charAt(0).toUpperCase()}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td style={{verticalAlign:'top'}}>
+                                                            <span style={{fontSize:20, fontWeight:"bold", marginLeft:10 }}>{ item.userDev.name.charAt(0).toUpperCase() + item.userDev.name.slice(1) }</span>
+                                                        </td>
+                                                        <td style={{verticalAlign:'top'}}>
+                                                            <CTooltip content="Delete" placement="top-end">
+                                                                <CButton className="btn btn-sm btn-danger" onClick={() => {confirmDelDev(item)}}>
+                                                                    <CIcon name="cil-trash"></CIcon>
+                                                                </CButton>
+                                                            </CTooltip>
+                                                        </td>
+                                                    </tr>)
+                                                })
+                                        }
+                                    </tbody>
+                                </table>
+                            </CCol>
+                        </CRow>
+                    </CCardBody>
+                </CCard>
+            )
+        } else {
+            return (
+                <CRow>
+                    Data Not Found
+                </CRow>
+            )
+        }
+    }
+
+    const confirmDelDev = (data) => {
+        setModalDelDeveloper(true)
+        setDeveloper(data)
+    }
+
+    const delDev = (data) => {
+        Axs.delete(`api/request/${data.id}/deleteDev`,{})
+        .then((response) => {
+            Toast.fire({
+                icon:'success',
+                title:'Delete Successfully'
+            })
+            getRequest(data.requestId)
+            setModalDelDeveloper(false)
+        })
+        .catch((error) => {
+            Toast.fire({
+                icon:'error',
+                title:'Delete Fail'
+            })
+        })
     }
 
     /**
@@ -642,7 +746,7 @@ const Requests = () => {
         .then((response) => {
             Toast.fire({
                 icon:'success',
-                title:'Delete Duccessfulley'
+                title:'Delete Successfully'
             })
             setModalDelete(false)
         })
@@ -1102,6 +1206,7 @@ const Requests = () => {
                             </CRow>
                         </CCardBody>
                     </CCard>
+                    <UpdateRequestDevelopers/>
                     <EditDataAttachments/>
                 </CModalBody>
                 <CModalFooter>
@@ -1134,6 +1239,36 @@ const Requests = () => {
                         type="button"
                         color="secondary" 
                         onClick={() => {setModalDelete(false)}}
+                        >Cancel
+                        <CIcon name="cil-x" className="ml-2 mb-1"></CIcon>
+                    </CButton>
+                </CButtonGroup>
+            </CModalFooter>
+        </CModal>
+         {/* modal delete developers */}
+         <CModal
+            show={modalDelDeveloper}
+            onClose={setModalDelDeveloper}
+            size="sm"
+        >
+            <CModalBody style={{backgroundColor:'black',color:'white'}}>
+               <h4>Remove this ?</h4>
+            </CModalBody>
+            <CModalFooter>
+                <CButtonGroup>
+                    <CButton
+                    type="button"
+                    color="danger"
+                    className="btn btn-sm"
+                    onClick={() => {delDev(developer)}}
+                    >Delete
+                    <CIcon className="mb-1 ml-2" name="cil-trash"></CIcon>
+                    </CButton>
+                    <CButton 
+                        type="button"
+                        color="secondary" 
+                        onClick={() => {setModalDelDeveloper(false)}}
+                        className="btn btn-sm"
                         >Cancel
                         <CIcon name="cil-x" className="ml-2 mb-1"></CIcon>
                     </CButton>

@@ -43,7 +43,7 @@ const TheSidebar = () => {
       show={show}
       onShowChange={(val) => dispatch({type: 'set', sidebarShow: val })}
     >
-      <CSidebarBrand style={{ backgroundColor:'white' }} className="d-md-down-none" to="/">
+      <CSidebarBrand style={{ backgroundColor:'#edf1f5' }} className="d-md-down-none" to="/">
         {/* <CIcon
           className="c-sidebar-brand-full"
           name="logo-negative"

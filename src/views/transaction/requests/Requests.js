@@ -111,7 +111,7 @@ const Requests = () => {
     });
 
     /**
-     * get data incidents
+     * get data requests
      */
     const getRequests = () => {
         Axs.get('api/request',{
@@ -127,6 +127,10 @@ const Requests = () => {
         })
     }
 
+    /**
+     * get data request
+     * @param {*} id 
+     */
     const getRequest = (id) => {
         Axs.get(`api/request/${id}`,{
 
@@ -136,6 +140,20 @@ const Requests = () => {
         })
         .catch((error) => {
             history.push('/login')
+        })
+    }
+
+    const getDataDevelopers = (id) => {
+        Axs.get(`api/request/${id}/get/dev/users`,{})
+        .then(response => {
+            setDevelopers(response.data.data)
+        })
+    }
+
+    const getAllDevelopers = () => {
+        Axs.get('api/user/data/developers',{})
+        .then((response) => {
+            setDevelopers(response.data.data)
         })
     }
 
@@ -255,7 +273,8 @@ const Requests = () => {
                     "business_need":formData.ebusiness_need,
                     "business_value":formData.ebusiness_value,
                     "phone":formData.ephone,
-                    "location":formData.elocation
+                    "location":formData.elocation,
+                    "developers":devSelect
                 })
             
                 for(var u = 0; u < fileData.length; u++){
@@ -281,7 +300,8 @@ const Requests = () => {
                     "ebusiness_need":formData.ebusiness_need,
                     "ebusiness_value":formData.ebusiness_value,
                     "location":formData.elocation,
-                    "phone":formData.ephone
+                    "phone":formData.ephone,
+                    "developers":devSelect
                 })
                 // cek
                 if(updateRequest.data.status === "success"){
@@ -378,6 +398,7 @@ const Requests = () => {
         setRequest(item)
         setModalOpen(true)
         setDevSelect([])
+        getAllDevelopers()
     }
 
     /**
@@ -771,6 +792,7 @@ const Requests = () => {
         setupData("ebusiness_value",requestData.business_value)
         setupData("elocation",requestData.location)
         setupData("ephone",requestData.phone)
+        getDataDevelopers(requestData.id)
     }
 
     /**
@@ -1204,6 +1226,47 @@ const Requests = () => {
                                     </CFormGroup>
                                 </CCol>
                             </CRow>
+                            <CRow>
+                                <CCol>
+                                    <CFormGroup>
+                                        <CLabel>Developer</CLabel>
+                                        <select name="edeveloper" className="form-control" onChange={handleSelDeveloper}>
+                                                <option value="0">Chose...</option>
+                                            {
+                                                developers.map((value,index) => {
+                                                    return <option valuetext={value.name} key={index} value={value.id}>{value.name}</option>
+                                                })
+                                            }
+                                        </select>
+                                    </CFormGroup>
+                                </CCol>
+                            </CRow>
+                            <CRow>
+                                <CCol>
+                                    <CFormGroup>
+                                        <CLabel>Developer choosed:</CLabel>
+                                        <table className="table">
+                                            <tbody>
+                                                {
+                                                    devSelect.map((value,index) => {
+                                                        return( 
+                                                            <tr key={index}>
+                                                                <td><CIcon name="cil-check-alt"></CIcon></td>
+                                                                <td>{value.name}</td>
+                                                                <td>
+                                                                    <CTooltip content="remove" placement="top-end">
+                                                                        <CButton className="btn btn-sm btn-danger" onClick={() => {removeSelDeveloper(value.value)}}><CIcon name="cil-x"></CIcon></CButton>
+                                                                    </CTooltip>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    })
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </CFormGroup>
+                                </CCol>
+                            </CRow>
                         </CCardBody>
                     </CCard>
                     <UpdateRequestDevelopers/>
@@ -1245,8 +1308,8 @@ const Requests = () => {
                 </CButtonGroup>
             </CModalFooter>
         </CModal>
-         {/* modal delete developers */}
-         <CModal
+        {/* modal delete developers */}
+        <CModal
             show={modalDelDeveloper}
             onClose={setModalDelDeveloper}
             size="sm"
@@ -1378,7 +1441,7 @@ const Requests = () => {
                 </CButtonGroup>
             </CModalFooter>
         </CModal>
-        {/* moda close request */}
+        {/* modal close request */}
         <CModal
             show={modalClose}
             onClose={setModalClose}

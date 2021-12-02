@@ -56,7 +56,7 @@ const Teams = () => {
   const [successDelete, setSuccessDelete] = useState(0)
   const url = useSelector(state => state.baseUrl)
   const dispatch = useDispatch()
-  
+
   let getTeam = () => {
     axios.get(`${url}/api/team/`,{
       headers:{
@@ -108,6 +108,12 @@ const Teams = () => {
     });
   }
 
+  let addTeam = () => {
+    setIname('');
+    setModalAdd(!modal)
+
+  }
+
   let storeTeam = (id) => {
     axios.post(`${url}/api/team/store`,{
       name:iname
@@ -146,12 +152,12 @@ const Teams = () => {
     getTeam()
   }, [])
 
- 
+
   return (
     <>
       <CRow>
-        <CModal 
-          show={modal} 
+        <CModal
+          show={modal}
           onClose={setModal}
         >
           <CModalHeader closeButton>
@@ -169,15 +175,15 @@ const Teams = () => {
           </CModalBody>
           <CModalFooter>
             <CButton onClick={() => {updateTeam(eid)}} color="primary">Update</CButton>
-            <CButton 
-              color="secondary" 
+            <CButton
+              color="secondary"
               onClick={() => {setModal(false)}}
             >Cancel</CButton>
           </CModalFooter>
         </CModal>
         {/* add modal */}
-        <CModal 
-          show={modalAdd} 
+        <CModal
+          show={modalAdd}
           onClose={setModalAdd}
         >
           <CModalHeader closeButton>
@@ -188,15 +194,15 @@ const Teams = () => {
               <CCol xs="12">
                 <CFormGroup>
                   <CLabel htmlFor="name">Name</CLabel>
-                  <CInput onChange={event => setIname(event.target.value)} id="name" placeholder="Enter your name" required />
+                  <CInput onChange={event => setIname(event.target.value)} id="name" placeholder="Enter your name" value={iname} required />
                 </CFormGroup>
               </CCol>
             </CRow>
           </CModalBody>
           <CModalFooter>
             <CButton onClick={() => {storeTeam()}} color="primary">Save</CButton>
-            <CButton 
-              color="secondary" 
+            <CButton
+              color="secondary"
               onClick={() => {setModalAdd(false)}}
             >Cancel</CButton>
           </CModalFooter>
@@ -204,7 +210,7 @@ const Teams = () => {
         <CCol xs="12" lg="12">
           <CCard>
             <CCardHeader>
-              <CButton onClick={() => {setModalAdd(!modal)}} size="sm" color="primary">
+              <CButton onClick={() => {addTeam()}} size="sm" color="primary">
                 Add Team
               </CButton>
             </CCardHeader>

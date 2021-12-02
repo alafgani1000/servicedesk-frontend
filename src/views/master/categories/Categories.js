@@ -63,7 +63,7 @@ const Categories = () => {
       },
       baseURL: url
   })
-  
+
   const getCategories = () => {
     Axs.get(`api/category/`,{
 
@@ -122,7 +122,7 @@ const Categories = () => {
 
   let deleteCategory = (id) => {
     Axs.delete(`api/category/${id}/delete`,{
-     
+
     })
     .then(function(){
       setSuccessDelete(10)
@@ -135,16 +135,22 @@ const Categories = () => {
     })
   }
 
+  let addCategory = () => {
+    setModalAdd(!modal)
+    setIname('')
+    setIinterval('')
+  }
+
   useEffect(() => {
     getCategories()
   }, [])
 
- 
+
   return (
     <>
       <CRow>
-        <CModal 
-          show={modal} 
+        <CModal
+          show={modal}
           onClose={setModal}
         >
           <CModalHeader closeButton>
@@ -166,13 +172,13 @@ const Categories = () => {
           </CModalBody>
           <CModalFooter>
             <CButton onClick={() => {updateStage(eid)}} color="primary">Update</CButton>
-            <CButton 
-              color="secondary" 
+            <CButton
+              color="secondary"
               onClick={() => {setModal(false)}}
             >Cancel</CButton>
           </CModalFooter>
         </CModal>
-        <CModal 
+        <CModal
             show={modalDelete}
             onClose={setModalDelete}
         >
@@ -188,15 +194,15 @@ const Categories = () => {
             </CModalBody>
             <CModalFooter>
                 <CButton onClick={() => {deleteCategory(delid)}} color="primary">Delete</CButton>
-                <CButton 
-                color="secondary" 
+                <CButton
+                color="secondary"
                 onClick={() => {setModalDelete(false)}}
                 >Cancel</CButton>
             </CModalFooter>
         </CModal>
         {/* add modal */}
-        <CModal 
-          show={modalAdd} 
+        <CModal
+          show={modalAdd}
           onClose={setModalAdd}
         >
           <CModalHeader closeButton>
@@ -207,19 +213,19 @@ const Categories = () => {
               <CCol xs="12">
                 <CFormGroup>
                   <CLabel htmlFor="name">Name</CLabel>
-                  <CInput onChange={event => setIname(event.target.value)} id="name" placeholder="Enter name category" required />
+                  <CInput onChange={event => setIname(event.target.value)} id="name" value={iname} placeholder="Enter name category" required />
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel htmlFor="interval">Interval</CLabel>
-                    <CInput onChange={event => setIinterval(event.target.value)} id="interval" placeholder="Interval" required />
+                    <CInput onChange={event => setIinterval(event.target.value)} id="interval" value={iinterval} placeholder="Interval" required />
                 </CFormGroup>
               </CCol>
             </CRow>
           </CModalBody>
           <CModalFooter>
             <CButton onClick={() => {storeStage()}} color="primary">Save</CButton>
-            <CButton 
-              color="secondary" 
+            <CButton
+              color="secondary"
               onClick={() => {setModalAdd(false)}}
             >Cancel</CButton>
           </CModalFooter>
@@ -227,7 +233,7 @@ const Categories = () => {
         <CCol xs="12" lg="12">
           <CCard>
             <CCardHeader>
-              <CButton onClick={() => {setModalAdd(!modal)}} size="sm" color="primary">
+              <CButton onClick={() => {addCategory()}} size="sm" color="primary">
                 Add Category
               </CButton>
             </CCardHeader>

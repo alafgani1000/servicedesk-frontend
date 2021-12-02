@@ -66,7 +66,7 @@ const Stages = () => {
       },
       baseURL: url
   })
-  
+
   const getStage = () => {
     Axs.get(`api/stage/`,{
 
@@ -126,7 +126,7 @@ const Stages = () => {
 
   let deleteStage = (id) => {
     Axs.delete(`api/stage/${id}/delete`,{
-     
+
     })
     .then(function(){
       setSuccessDelete(10)
@@ -139,16 +139,22 @@ const Stages = () => {
     })
   }
 
+  let addStage = () => {
+    setModalAdd(!modal)
+    setIdesc('')
+    setItext('')
+  }
+
   useEffect(() => {
     getStage()
   }, [])
 
- 
+
   return (
     <>
       <CRow>
-        <CModal 
-          show={modal} 
+        <CModal
+          show={modal}
           onClose={setModal}
         >
           <CModalHeader closeButton>
@@ -170,13 +176,13 @@ const Stages = () => {
           </CModalBody>
           <CModalFooter>
             <CButton onClick={() => {updateStage(eid)}} color="primary">Update</CButton>
-            <CButton 
-              color="secondary" 
+            <CButton
+              color="secondary"
               onClick={() => {setModal(false)}}
             >Cancel</CButton>
           </CModalFooter>
         </CModal>
-        <CModal 
+        <CModal
             show={modalDelete}
             onClose={setModalDelete}
         >
@@ -192,15 +198,15 @@ const Stages = () => {
             </CModalBody>
             <CModalFooter>
                 <CButton onClick={() => {deleteStage(delid)}} color="primary">Delete</CButton>
-                <CButton 
-                color="secondary" 
+                <CButton
+                color="secondary"
                 onClick={() => {setModalDelete(false)}}
                 >Cancel</CButton>
             </CModalFooter>
         </CModal>
         {/* add modal */}
-        <CModal 
-          show={modalAdd} 
+        <CModal
+          show={modalAdd}
           onClose={setModalAdd}
         >
           <CModalHeader closeButton>
@@ -211,19 +217,19 @@ const Stages = () => {
               <CCol xs="12">
                 <CFormGroup>
                   <CLabel htmlFor="text">Text</CLabel>
-                  <CInput onChange={event => setItext(event.target.value)} id="text" placeholder="Enter name stage" required />
+                  <CInput onChange={event => setItext(event.target.value)} id="text" value={itext} placeholder="Enter name stage" required />
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel htmlFor="text">Description</CLabel>
-                    <CInput onChange={event => setIdesc(event.target.value)} id="desc" placeholder="Description" required />
+                    <CInput onChange={event => setIdesc(event.target.value)} id="desc" value={idesc} placeholder="Description" required />
                 </CFormGroup>
               </CCol>
             </CRow>
           </CModalBody>
           <CModalFooter>
             <CButton onClick={() => {storeStage()}} color="primary">Save</CButton>
-            <CButton 
-              color="secondary" 
+            <CButton
+              color="secondary"
               onClick={() => {setModalAdd(false)}}
             >Cancel</CButton>
           </CModalFooter>
@@ -231,7 +237,7 @@ const Stages = () => {
         <CCol xs="12" lg="12">
           <CCard>
             <CCardHeader>
-              <CButton onClick={() => {setModalAdd(!modal)}} size="sm" color="primary">
+              <CButton onClick={() => {addStage()}} size="sm" color="primary">
                 Add Stage
               </CButton>
             </CCardHeader>

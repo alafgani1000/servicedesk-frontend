@@ -56,7 +56,7 @@ const Roles = () => {
   const [successDelete, setSuccessDelete] = useState(0)
   const url = useSelector(state => state.baseUrl)
   const dispatch = useDispatch()
-  
+
   let getRole = () => {
     axios.get(`${url}/api/role/`,{
       headers:{
@@ -142,16 +142,21 @@ const Roles = () => {
     })
   }
 
+  let addRole = () => {
+    setIname('')
+    setModalAdd(!modal)
+  }
+
   useEffect(() => {
     getRole()
   }, [])
 
- 
+
   return (
     <>
       <CRow>
-        <CModal 
-          show={modal} 
+        <CModal
+          show={modal}
           onClose={setModal}
         >
           <CModalHeader closeButton>
@@ -169,15 +174,15 @@ const Roles = () => {
           </CModalBody>
           <CModalFooter>
             <CButton onClick={() => {updateRole(eid)}} color="primary">Update</CButton>
-            <CButton 
-              color="secondary" 
+            <CButton
+              color="secondary"
               onClick={() => {setModal(false)}}
             >Cancel</CButton>
           </CModalFooter>
         </CModal>
         {/* add modal */}
-        <CModal 
-          show={modalAdd} 
+        <CModal
+          show={modalAdd}
           onClose={setModalAdd}
         >
           <CModalHeader closeButton>
@@ -188,15 +193,15 @@ const Roles = () => {
               <CCol xs="12">
                 <CFormGroup>
                   <CLabel htmlFor="name">Name</CLabel>
-                  <CInput onChange={event => setIname(event.target.value)} id="role" placeholder="Enter your name" required />
+                  <CInput onChange={event => setIname(event.target.value)} id="role" placeholder="Enter your name" value={iname} required />
                 </CFormGroup>
               </CCol>
             </CRow>
           </CModalBody>
           <CModalFooter>
             <CButton onClick={() => {storeRole()}} color="primary">Save</CButton>
-            <CButton 
-              color="secondary" 
+            <CButton
+              color="secondary"
               onClick={() => {setModalAdd(false)}}
             >Cancel</CButton>
           </CModalFooter>
@@ -204,7 +209,7 @@ const Roles = () => {
         <CCol xs="12" lg="12">
           <CCard>
             <CCardHeader>
-              <CButton onClick={() => {setModalAdd(!modal)}} size="sm" color="primary">
+              <CButton onClick={() => {addRole()}} size="sm" color="primary">
                 Add Role
               </CButton>
             </CCardHeader>

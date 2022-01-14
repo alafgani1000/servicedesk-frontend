@@ -29,6 +29,12 @@ import CIcon from '@coreui/icons-react'
         icon: <CIcon name="cil-pencil" customClasses="c-sidebar-nav-icon"/>,
       },
       {
+        _tag: 'CSidebarNavItem',
+        name: 'Loangoods',
+        to: '/transaction/loangoods',
+        icon: <CIcon name="cil-transfer" customClasses="c-sidebar-nav-icon"/>,
+      },
+      {
         _tag: 'CSidebarNavTitle',
         _children: ['Master Data']
       },

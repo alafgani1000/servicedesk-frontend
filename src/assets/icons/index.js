@@ -136,6 +136,7 @@ import {
   cilPlus,
   cilReload,
   cilZoom,
+  cilTransfer,
 } from '@coreui/icons'
 
 export const icons = Object.assign({}, {
@@ -242,6 +243,7 @@ export const icons = Object.assign({}, {
   cilPlus,
   cilReload,
   cilZoom,
+  cilTransfer,
 }, {
   cifUs,
   cifBr,

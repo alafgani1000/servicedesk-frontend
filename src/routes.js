@@ -45,6 +45,7 @@ const Stages = React.lazy(() => import('./views/master/stages/Stages'));
 const Categories = React.lazy(() => import('./views/master/categories/Categories'))
 const Users = React.lazy(() => import('./views/master/users/Users'))
 const Requesest = React.lazy(() => import('./views/transaction/requests/Requests'))
+const Loangoods = React.lazy(() => import('./views/transaction/loangoods/Loangoods'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
@@ -87,14 +88,15 @@ const routes = [
   // { path: '/users', exact: true,  name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   // new
-  
+
   { path: '/transaction/incidents', name: 'Incidents', component: Incidents},
   { path: '/transaction/requests', name: 'Requests', component: Requests },
   { path: '/master/teams', name: 'Teams', component: Teams},
   { path: '/master/roles', name: 'Roles', component: Roles},
   { path: '/master/stages', name: 'Stages', component: Stages},
   { path: '/master/categories', name: 'Categories', component: Categories },
-  { path: '/master/users', name: 'Users', component: Users }
+  { path: '/master/users', name: 'Users', component: Users },
+  { path: '/transaction/loangoods', name: 'Loangoods', component: Loangoods}
 ];
 
 export default routes;

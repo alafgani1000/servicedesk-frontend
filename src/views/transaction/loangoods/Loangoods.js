@@ -58,34 +58,21 @@ const formReducer = (state, event) => {
 const fields = ['nopegawai','kodeBarang','namaBarang', 'Pinjam', 'Kembali', 'createdAt', 'updatedAt', 'actions']
 
 const Loangoods = () => {
-  const [formData, setFormData] =  useReducer(formReducer, {})
-  const [submitting, setSubmitting] = useState(false)
-  const [fileData, setFileData] = useState("")
-  const imageRef = useRef()
-
   const [status, setStatus] = useState(null)
   const [peminjamans, setPeminjamans] = useState([])
   const [peminjaman, setPeminjaman] = useState();
-  const [modal, setModal] = useState(false)
   const [modalAdd, setModalAdd] = useState(false)
-  const [modalDetail, setModalDetail] = useState(false)
-  const [modalDelete, setModalDelete] = useState(false)
   const [modalEdit, setModalEdit] = useState(false)
-  const [modalDelAttach, setModalDelAttach] = useState(false)
-  const [modalCreateTicket, setModalCreateTicket] = useState(false)
-  const [modalResolve, setModalResolve] = useState(false)
-  const [stages, setStages] = useState()
-  const [teams, setTeams] = useState([])
-  const [timeInterval, setTimeInterval] = useState('')
-  const [categories, setCategories] = useState([])
-  const [stageOpen, setStageOpen] = useState();
-  const [attachmentId, setAttachmentId] = useState()
+  const [modalDelete, setModalDelete] = useState(false)
   const [successCreate, setSuccessCreate] = useState(0)
-  const [successDelete, setSuccessDelete] = useState(0)
-  const [resolveText, setResolveText] = useState("")
-  const [successUpdate, setSuccessUpdate] = useState(0)
-  const [failUpdate, setFailUpdate] = useState(0)
-  const [stateIncidentSearch, setStateIncidentSearch] = useState("")
+  const [failCreate, setFailCreate] = useState(0)
+  const [responseMessage, setResponseMessage] = useState('')
+  const [nopegawai, setNopegawai] = useState('');
+  const [kodeBarang, setKodeBarang] = useState('');
+  const [namaBarang, setNamaBarang] = useState('');
+  const [enopegawai, setEnopegawai] = useState('');
+  const [ekodeBarang, setEkodeBarang] = useState('');
+  const [enamaBarang, setEnamaBarang] = useState('')
 
   const url = useSelector(state => state.baseUrl)
   const role = useSelector(state => state.role)
@@ -110,7 +97,7 @@ const Loangoods = () => {
    */
   const Asios = axios.create({
     headers: {
-      'token': localStorage.getItem('shitToken')
+      'token': localStorage.getItem('shitToken'),
     },
     baseURL:url
   });
@@ -136,7 +123,7 @@ const Loangoods = () => {
    * get data peminjaman
    */
   const getPeminjaman = () => {
-    Axs.get(`api/peminjama/${peminjaman.id}`, {
+    Axs.get(`api/peminjaman/${peminjaman.id}`, {
 
     })
     .then(function(response){
@@ -153,41 +140,74 @@ const Loangoods = () => {
 
   const handleSubmit = event => {
     event.preventDefault()
-    setSubmitting(true);
-    const dataArray = new FormData()
-    dataArray.append("nopegawai", formData.nopegawai)
-    dataArray.append("kodeBarang", formData.kodeBarang)
-    dataArray.append("namaBarang", formData.namaBarang)
-    Axs.post('/api/peminjman/pinjam',dataArray)
-      .then()
+    Asios.post('/api/peminjaman/pinjam',
+      {
+        nopegawai:nopegawai,
+        kode_barang:kodeBarang,
+        nama_barang:namaBarang
+      }
+    ).then(function(response){
+        setModalAdd(false);
+        setResponseMessage('Input success');
+        setSuccessCreate(10);
+        getPeminjamans();
+        resetForm();
+    }).catch(function(response){
+      console.log(response);
+    })
+  }
+
+  const handleUpdate = event => {
+    event.preventDefault()
+    Asios.put(`/api/peminjaman/${peminjaman.id}/update`,{
+      nopegawai: enopegawai,
+      kodeBarang: ekodeBarang,
+      namaBarang: enamaBarang
+    }).then(function(response){
+      setModalEdit(false);
+      setResponseMessage('Update success')
+      setSuccessCreate(10);
+      getPeminjamans();
+    }).catch(function(response){
+      console.log(response);
+    })
+  }
+
+  const deletePeminjaman = (peminjaman) => {
+    Asios.delete(`/api/peminjaman/${peminjaman.id}/delete`,{
+
+    }).then(function(respose){
+      setModalDelete(false);
+      getPeminjamans();
+      setResponseMessage('Delete success');
+      setSuccessCreate(10);
+    }).catch(function(response){
+      console.log(response);
+    })
+  }
+
+  const edit = (peminjaman) => {
+    setPeminjaman(peminjaman);
+    setModalEdit(true);
+    setEnopegawai(peminjaman.nopegawai);
+    setEkodeBarang(peminjaman.kodeBarang);
+    setEnamaBarang(peminjaman.namaBarang);
+  }
+
+  const deleteConfirm = (peminjaman) => {
+    setPeminjaman(peminjaman)
+    setModalDelete(true)
+  }
+
+  const resetForm = () => {
+    setNopegawai('');
+    setKodeBarang('');
+    setNamaBarang('');
   }
 
   const reset = () => {
 
   }
-
-   /**
-   * menyimpan inputan di formData
-   * @param {*} nameParam
-   * @param {*} valueParam
-   */
-    const setupData = (nameParam, valueParam) => {
-      setFormData({
-        name:nameParam,
-        value:valueParam
-      })
-    }
-
-    /**
-     * mengambil inputan untuk proses create incident
-     */
-    const handleChange = event => {
-      const isCheckbox = event.target.type === 'checkbox';
-      setFormData({
-        name: event.target.name,
-        value: isCheckbox ? event.target.checked : event.target.value,
-      })
-    }
 
   useEffect(() => {
     getPeminjamans();
@@ -196,6 +216,24 @@ const Loangoods = () => {
   return (
     <>
       <CRow>
+        {/* modal add */}
+        <CCol xs="12" lg="12">
+          <CAlert
+            color="success"
+            show={successCreate}
+            closeButton
+            onShowChange={setSuccessCreate}
+          >
+            {responseMessage}
+            <CProgress
+              striped
+              color="success"
+              value={Number(successCreate) * 10}
+              size="xs"
+              className="mb-3"
+            />
+          </CAlert>
+        </CCol>
         {/* modal add */}
         <CModal
           show={modalAdd}
@@ -211,7 +249,7 @@ const Loangoods = () => {
                 <CCol sx="12">
                   <CFormGroup>
                       <CLabel htmlFor="nopegawai">Nopegawai</CLabel>
-                      <CInput id="nopegawai" name="nopegawai" onChange={handleChange} required />
+                      <CInput id="nopegawai" name="nopegawai" onChange={event => setNopegawai(event.target.value)} value={nopegawai} required />
                   </CFormGroup>
                 </CCol>
               </CRow>
@@ -219,13 +257,13 @@ const Loangoods = () => {
                 <CCol sx="6">
                   <CFormGroup>
                       <CLabel htmlFor="kodeBarang">Kode Barang</CLabel>
-                      <CInput id="kodeBarang" name="kodeBarang" onChange={handleChange} required />
+                      <CInput id="kodeBarang" name="kodeBarang" onChange={event => setKodeBarang(event.target.value)} value={kodeBarang} required />
                   </CFormGroup>
                 </CCol>
                 <CCol sx="6">
                   <CFormGroup>
                       <CLabel htmlFor="namaBarang">Nama Barang</CLabel>
-                      <CInput id="namaBarang" name="namaBarang" onChange={handleChange} required />
+                      <CInput id="namaBarang" name="namaBarang" onChange={event => setNamaBarang(event.target.value)} value={namaBarang} required />
                   </CFormGroup>
                 </CCol>
               </CRow>
@@ -241,6 +279,68 @@ const Loangoods = () => {
               </CButtonGroup>
             </CModalFooter>
           </CForm>
+        </CModal>
+        {/* modal edit */}
+        <CModal
+          show={modalEdit}
+          onClose={setModalEdit}
+          size="lg"
+        >
+          <CForm onSubmit={handleUpdate} method="post">
+            <CModalHeader>
+              <CModalTitle>Update Incident</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CRow>
+                <CCol sx="12">
+                  <CFormGroup>
+                      <CLabel htmlFor="nopegawai">Nopegawai</CLabel>
+                      <CInput id="enopegawai" name="enopegawai" onChange={event => setEnopegawai(event.target.value)} value={enopegawai} required />
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sx="6">
+                  <CFormGroup>
+                      <CLabel htmlFor="kodeBarang">Kode Barang</CLabel>
+                      <CInput id="ekodeBarang" name="ekodeBarang" onChange={event => setEkodeBarang(event.target.value)} value={ekodeBarang} required />
+                  </CFormGroup>
+                </CCol>
+                <CCol sx="6">
+                  <CFormGroup>
+                      <CLabel htmlFor="namaBarang">Nama Barang</CLabel>
+                      <CInput id="enamaBarang" name="enamaBarang" onChange={event => setEnamaBarang(event.target.value)} value={enamaBarang} required />
+                  </CFormGroup>
+                </CCol>
+              </CRow>
+            </CModalBody>
+            <CModalFooter>
+              <CButtonGroup>
+                <CButton type="submit" color="primary">Save</CButton>
+                <CButton
+                  color="secondary"
+                  onClick={() => {setModalEdit(false)}}
+                >Cancel</CButton>
+              </CButtonGroup>
+            </CModalFooter>
+          </CForm>
+        </CModal>
+        {/* modal delete */}
+        <CModal
+          show={modalDelete}
+          onClose={setModalDelete}
+          size="sm"
+        >
+            <CModalBody>
+              Delete data ?
+            </CModalBody>
+            <CModalFooter>
+              <CButton type="submit" color="danger" onClick={() => deletePeminjaman(peminjaman)}>Delete</CButton>
+              <CButton
+                color="secondary"
+                onClick={() => {setModalDelete(false)}}
+              >Cancel</CButton>
+            </CModalFooter>
         </CModal>
         {/* data table */}
         <CCol xs="12" lg="12">
@@ -295,9 +395,19 @@ const Loangoods = () => {
                 (item)=>(
                   <td>
                     <CButtonGroup>
-                      <CTooltip content="Kembali" placement="top-end">
-                        <CButton className="text-white" size="sm" color={getBadge('Pending')}>
+                      <CTooltip content="Edit" placement="top-end">
+                        <CButton className="text-white" size="sm" color={getBadge('Pending')} onClick={() => edit(item)}>
                           <CIcon name="cil-pencil"/>
+                        </CButton>
+                      </CTooltip>
+                      <CTooltip content="Delete" placement="top-end">
+                        <CButton className="text-white" size="sm" color={getBadge('Banned')} onClick={() => deleteConfirm(item)}>
+                          <CIcon name="cil-trash"/>
+                        </CButton>
+                      </CTooltip>
+                      <CTooltip content="Return" placement="top-end">
+                        <CButton className="text-white" size="sm" color={getBadge('Primary')}>
+                          <CIcon name="cil-task"/>
                         </CButton>
                       </CTooltip>
                       <CTooltip content="Detail" placement="top-end">

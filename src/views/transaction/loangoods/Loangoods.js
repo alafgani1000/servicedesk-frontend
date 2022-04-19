@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useReducer, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CRow,
   CCol,
@@ -6,7 +6,6 @@ import {
   CCardHeader,
   CCardBody,
   CDataTable,
-  CBadge,
   CButton,
   CModal,
   CModalHeader,
@@ -17,14 +16,7 @@ import {
   CLabel,
   CInput,
   CForm,
-  CTextarea,
-  CSelect,
-  CInputFile,
   CButtonGroup,
-  CCardFooter,
-  CCardTitle,
-  CCardText,
-  CLink,
   CAlert,
   CProgress,
   CTooltip,
@@ -35,8 +27,8 @@ import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import Swal from "sweetalert2";
-import io from "socket.io-client";
+// import Swal from "sweetalert2";
+// import io from "socket.io-client";
 
 const getBadge = (stage) => {
   switch (stage) {
